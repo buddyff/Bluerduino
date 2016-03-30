@@ -23,6 +23,11 @@
             android:name=".Car.Car_Setup"
             android:label="@string/app_name" >
         </activity>
+
+        <activity
+            android:name=".Car.Car_Activity"
+            android:label="@string/app_name" >
+        </activity>
     </application>
 
 </manifest>
