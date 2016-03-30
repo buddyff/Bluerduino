@@ -28,8 +28,10 @@ public class Car_Setup extends Activity {
     ListView pairedListView;
 
     // Member fields
-    private BluetoothAdapter mBtAdapter;
-    private ArrayAdapter<String> mPairedDevicesArrayAdapter;
+    private BluetoothAdapter btAdapter;
+    private ArrayAdapter<String> pairedDevicesArray;
+
+    public static String EXTRA_DEVICE_ADDRESS;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,11 +42,12 @@ public class Car_Setup extends Activity {
         textConnectionStatus.setTextSize(40);
 
         // Initialize array adapter for paired devices
-        mPairedDevicesArrayAdapter = new ArrayAdapter<String>(this, R.layout.device_name);
+        pairedDevicesArray = new ArrayAdapter<String>(this, R.layout.device_name);
 
         // Find and set up the ListView for paired devices
         pairedListView = (ListView) findViewById(R.id.paired_devices);
-        pairedListView.setAdapter(mPairedDevicesArrayAdapter);
+        pairedListView.setAdapter(pairedDevicesArray);
+        pairedListView.setOnItemClickListener(deviceClickListener);
     }
 
     @Override
@@ -53,24 +56,24 @@ public class Car_Setup extends Activity {
         //It is best to check BT status at onResume in case something has changed while app was paused etc
         checkBTState();
 
-        mPairedDevicesArrayAdapter.clear();// clears the array so items aren't duplicated when resuming from onPause
+        pairedDevicesArray.clear();// clears the array so items aren't duplicated when resuming from onPause
 
         textConnectionStatus.setText(" "); //makes the textview blank
 
         // Get the local Bluetooth adapter
-        mBtAdapter = BluetoothAdapter.getDefaultAdapter();
+        btAdapter = BluetoothAdapter.getDefaultAdapter();
 
         // Get a set of currently paired devices and append to pairedDevices list
-        Set<BluetoothDevice> pairedDevices = mBtAdapter.getBondedDevices();
+        Set<BluetoothDevice> pairedDevices = btAdapter.getBondedDevices();
 
         // Add previously paired devices to the array
         if (pairedDevices.size() > 0) {
             findViewById(R.id.title_paired_devices).setVisibility(View.VISIBLE);//make title viewable
             for (BluetoothDevice device : pairedDevices) {
-                mPairedDevicesArrayAdapter.add(device.getName() + "\n" + device.getAddress());
+                pairedDevicesArray.add(device.getName() + "\n" + device.getAddress());
             }
         } else {
-            mPairedDevicesArrayAdapter.add("no devices paired");
+            pairedDevicesArray.add("no devices paired");
         }
     }
 
@@ -78,18 +81,39 @@ public class Car_Setup extends Activity {
     //Prompts the user to turn it on if it is off
     private void checkBTState(){
         // Check device has Bluetooth and that it is turned on
-        mBtAdapter=BluetoothAdapter.getDefaultAdapter(); // CHECK THIS OUT THAT IT WORKS!!!
-        if(mBtAdapter==null) {
+        btAdapter=BluetoothAdapter.getDefaultAdapter(); // CHECK THIS OUT THAT IT WORKS!!!
+        if(btAdapter==null) {
             Toast.makeText(getBaseContext(), "Device does not support Bluetooth", Toast.LENGTH_SHORT).show();
             finish();
         } else {
-            if (!mBtAdapter.isEnabled()) {
+            if (!btAdapter.isEnabled()) {
                 //Prompt user to turn on Bluetooth
                 Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 startActivityForResult(enableBtIntent, 1);
             }
         }
     }
+
+    private void connect2arduino(){
+        //Todo: recorrer la lista de dispositivos emparejados, y conectarse con el arduino (corroborar esto leyendo las macs)
+
+    }
+
+    private OnItemClickListener deviceClickListener = new OnItemClickListener()
+    {
+        public void onItemClick(AdapterView<?> av, View v, int arg2, long arg3)
+        {
+            textConnectionStatus.setText("Connecting...");
+            // Get the device MAC address, which is the last 17 chars in the View
+            String info = ((TextView) v).getText().toString();
+            String address = info.substring(info.length() - 17);
+
+            // Make an intent to start next activity while taking an extra which is the MAC address.
+            Intent i = new Intent(Car_Setup.this, Car_Activity.class);
+            i.putExtra(EXTRA_DEVICE_ADDRESS, address);
+            startActivity(i);
+        }
+    };
 
 
 }
