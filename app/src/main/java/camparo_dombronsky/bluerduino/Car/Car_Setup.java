@@ -32,6 +32,7 @@ public class Car_Setup extends Activity {
     private ArrayAdapter<String> pairedDevicesArray;
 
     public static String EXTRA_DEVICE_ADDRESS;
+    private static String ARDUINO_MAC = "98:D3:35:00:98:52";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
