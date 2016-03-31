@@ -4,7 +4,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView android:id="@+id/title_paired_devices"
+    <Button
+        android:id="@+id/start_car"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="104dp"
+        android:text="Connect" />
+
+   <!-- <TextView android:id="@+id/title_paired_devices"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
@@ -20,14 +28,14 @@
         android:stackFromBottom="false"
         android:layout_weight="1"
         />
-
+-->
     <TextView
         android:id="@+id/connecting"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
-    <TextView
+   <!-- <TextView
         android:id="@+id/infoText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -40,6 +48,6 @@
         android:gravity="center">
 
     </LinearLayout>
-
+    -->
 
 </LinearLayout>
