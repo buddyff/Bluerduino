@@ -31,7 +31,7 @@ public class Car_Setup extends AppCompatActivity {
     private BluetoothDevice btDevice;
 
     //Thread
-    ConnectThread  hilo;
+    Connect2Arduino  hilo;
 
     public static String EXTRA_DEVICE_ADDRESS;
     private static final String ARDUINO_MAC = "98:D3:35:00:98:52";
@@ -70,7 +70,7 @@ public class Car_Setup extends AppCompatActivity {
                 if (device.getAddress().equals(ARDUINO_MAC)) {
                     //connect2arduino(device.getAddress());
                     System.out.println(device.getAddress());
-                    hilo = new ConnectThread(device);
+                    hilo = new Connect2Arduino(device);
                     hilo.start();
                     arduino_founded = true;
                     break;
@@ -153,41 +153,6 @@ public class Car_Setup extends AppCompatActivity {
         }
     }
 
-    private void connect2arduino(String mac) {
-
-        // Set up a pointer to the Arduino Bluetooth device using its mac address.
-        //BluetoothDevice device = btAdapter.getRemoteDevice(mac);
-
-
-
-        //Attempt to create a bluetooth socket for comms
-      /*  try {
-            btSocket = device.createRfcommSocketToServiceRecord(ARDUINO_UUID);
-        } catch (IOException e1) {
-            Toast.makeText(getBaseContext(), "ERROR - No se pudo crear el Socket Bluetooth", Toast.LENGTH_SHORT).show();
-        }
-
-        // Establish the connection.
-        try {
-            btSocket.connect();
-        } catch (IOException e) {
-            try {
-                btSocket.close();        //If IO exception occurs attempt to close socket
-            } catch (IOException e2) {
-                Toast.makeText(getBaseContext(), "ERROR - No se pudo cerrar el Socket Bluetooth", Toast.LENGTH_SHORT).show();
-            }
-        }
-
-        // Create a data stream so we can send data to the device
-        try {
-            outStream = btSocket.getOutputStream();
-        } catch (IOException e) {
-            Toast.makeText(getBaseContext(), "ERROR - No se pudo crear el OutStream", Toast.LENGTH_SHORT).show();
-        }
-        //When activity is resumed, attempt to send a piece of junk data ('TEST') so that it will fail if not connected
-        // On this way the app doesn't have to wait for a user to press button to recognise connection failure
-        sendData("TEST");*/
-    }
 
     // Method to send data
     private void sendData(String message) {
@@ -203,11 +168,11 @@ public class Car_Setup extends AppCompatActivity {
     }
 
 
-    class ConnectThread extends Thread {
+    class Connect2Arduino extends Thread {
         private final BluetoothSocket socket;
         private final BluetoothDevice device;
 
-        public ConnectThread(BluetoothDevice device) {
+        public Connect2Arduino(BluetoothDevice device) {
             BluetoothSocket tmp = null;
             this.device = device;
 
