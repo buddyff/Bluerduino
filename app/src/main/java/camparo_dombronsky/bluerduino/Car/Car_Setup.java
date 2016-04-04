@@ -26,9 +26,12 @@ public class Car_Setup extends AppCompatActivity {
     Button start_car;
 
     // Objects for the Bluetooth Connection
-    private BluetoothAdapter btAdapter;
-    private OutputStream outStream = null;
-    private BluetoothSocket btSocket = null;  //Represents the interface for a Bluetooth socket
+    private  BluetoothAdapter btAdapter;
+    private OutputStream outStream;
+    private BluetoothDevice btDevice;
+
+    //Thread
+    Connect2Arduino  hilo;
 
     public static String EXTRA_DEVICE_ADDRESS;
     private static final String ARDUINO_MAC = "98:D3:35:00:98:52";
@@ -44,8 +47,8 @@ public class Car_Setup extends AppCompatActivity {
 
         start_car = (Button) findViewById(R.id.start_car);
 
-        // Get the local Bluetooth adapter
-        btAdapter = BluetoothAdapter.getDefaultAdapter();
+
+
     }
 
     @Override
@@ -65,7 +68,10 @@ public class Car_Setup extends AppCompatActivity {
             boolean arduino_founded = false;
             for (BluetoothDevice device : pairedDevices) {
                 if (device.getAddress().equals(ARDUINO_MAC)) {
-                    connect2arduino(device.getAddress());
+                    //connect2arduino(device.getAddress());
+                    System.out.println(device.getAddress());
+                    hilo = new Connect2Arduino(device);
+                    hilo.start();
                     arduino_founded = true;
                     break;
                 }
@@ -80,11 +86,51 @@ public class Car_Setup extends AppCompatActivity {
     @Override
     public void onPause() {
         super.onPause();
-
+        System.out.println("PAUSA");
         //Close BT socket to device
         try {
-            btSocket.close();
+            if (hilo != null ) {
+                if (hilo.getSocket() != null) {
+                    System.out.println("CIERRO SOCKET DE PAUSA");
+                    hilo.getSocket().close();
+                }
+            }
         } catch (IOException e2) {
+            Toast.makeText(getBaseContext(), "ERROR - No se pudo cerrar el Socket Bluetooth", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        System.out.println("STOP");
+        //Close BT socket to device
+        try {
+            if (hilo != null) {
+                if (hilo.getSocket() != null) {
+                    System.out.println("CIERRO SOCKET DE STOP");
+                    hilo.getSocket().close();
+                }
+            }
+        }catch (IOException e2) {
+            Toast.makeText(getBaseContext(), "ERROR - No se pudo cerrar el Socket Bluetooth", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        System.out.println("DESTROY");
+        //Close BT socket to device
+        try {
+            if (hilo != null ) {
+                if (hilo.getSocket() != null) {
+                    System.out.println("CIERRO SOCKET DE DESTROY");
+                    hilo.getSocket().close();
+                }
+            }
+        }
+        catch (IOException e2) {
             Toast.makeText(getBaseContext(), "ERROR - No se pudo cerrar el Socket Bluetooth", Toast.LENGTH_SHORT).show();
         }
     }
@@ -107,42 +153,6 @@ public class Car_Setup extends AppCompatActivity {
         }
     }
 
-    private void connect2arduino(String mac) {
-
-        // Set up a pointer to the Arduino Bluetooth device using its mac address.
-        //BluetoothDevice device = btAdapter.getRemoteDevice(mac);
-
-        ConnectingThread t = new ConnectingThread(mac);
-        t.start();
-
-        //Attempt to create a bluetooth socket for comms
-      /*  try {
-            btSocket = device.createRfcommSocketToServiceRecord(ARDUINO_UUID);
-        } catch (IOException e1) {
-            Toast.makeText(getBaseContext(), "ERROR - No se pudo crear el Socket Bluetooth", Toast.LENGTH_SHORT).show();
-        }
-
-        // Establish the connection.
-        try {
-            btSocket.connect();
-        } catch (IOException e) {
-            try {
-                btSocket.close();        //If IO exception occurs attempt to close socket
-            } catch (IOException e2) {
-                Toast.makeText(getBaseContext(), "ERROR - No se pudo cerrar el Socket Bluetooth", Toast.LENGTH_SHORT).show();
-            }
-        }
-
-        // Create a data stream so we can send data to the device
-        try {
-            outStream = btSocket.getOutputStream();
-        } catch (IOException e) {
-            Toast.makeText(getBaseContext(), "ERROR - No se pudo crear el OutStream", Toast.LENGTH_SHORT).show();
-        }
-        //When activity is resumed, attempt to send a piece of junk data ('TEST') so that it will fail if not connected
-        // On this way the app doesn't have to wait for a user to press button to recognise connection failure
-        sendData("TEST");*/
-    }
 
     // Method to send data
     private void sendData(String message) {
@@ -150,7 +160,6 @@ public class Car_Setup extends AppCompatActivity {
         try {
             //attempt to place data on the outstream to the BT device
             outStream.write(msgBuffer);
-            textConnectionStatus.setText("Conexión con Arduino exitosa");
         } catch (IOException e) {
             //if the sending fails this is most likely because device is no longer there
             Toast.makeText(getBaseContext(), "ERROR - Dispositivo no encontrado", Toast.LENGTH_SHORT).show();
@@ -158,52 +167,50 @@ public class Car_Setup extends AppCompatActivity {
         }
     }
 
-    class ConnectingThread extends Thread {
-        private BluetoothDevice device;
 
-        public ConnectingThread(String mac) {
-            this.device = btAdapter.getRemoteDevice(mac);
+    class Connect2Arduino extends Thread {
+        private final BluetoothSocket socket;
+        private final BluetoothDevice device;
 
-            //Attempt to create a bluetooth socket for comms
+        public Connect2Arduino(BluetoothDevice device) {
+            BluetoothSocket tmp = null;
+            this.device = device;
+
+            // Get a BluetoothSocket to connect with the given BluetoothDevice
             try {
-                btSocket = device.createRfcommSocketToServiceRecord(ARDUINO_UUID);
-            } catch (IOException e) {
-                Toast.makeText(getBaseContext(), "ERROR - No se pudo cerrar el Socket Bluetooth", Toast.LENGTH_SHORT).show();
-            }
 
+                tmp = device.createRfcommSocketToServiceRecord(ARDUINO_UUID);
+            } catch (IOException e) { }
+            socket = tmp;
         }
 
         public void run() {
-            // Cancel any discovery as it will slow down the connection
+            // Cancel discovery because it will slow down the connection
             btAdapter.cancelDiscovery();
 
-            //Attempt to create a bluetooth socket for comms
             try {
-                btSocket = device.createRfcommSocketToServiceRecord(ARDUINO_UUID);
-            } catch (IOException e1) {
-                Toast.makeText(getBaseContext(), "ERROR - No se pudo crear el Socket Bluetooth", Toast.LENGTH_SHORT).show();
-            }
-
-            // Establish the connection.
-            try {
-                btSocket.connect();
-            } catch (IOException e) {
+                // Connect the device through the socket. This will block
+                // until it succeeds or throws an exception
+                socket.connect();
+            } catch (IOException connectException) {
+                // Unable to connect; close the socket and get out
                 try {
-                    btSocket.close();        //If IO exception occurs attempt to close socket
-                } catch (IOException e2) {
-                    Toast.makeText(getBaseContext(), "ERROR - No se pudo cerrar el Socket Bluetooth", Toast.LENGTH_SHORT).show();
-                }
+                    socket.close();
+                } catch (IOException closeException) { }
+                return;
             }
+        }
 
-            // Create a data stream so we can send data to the device
+        /** Will cancel an in-progress connection, and close the socket */
+        public void cancel() {
             try {
-                outStream = btSocket.getOutputStream();
-            } catch (IOException e) {
-                Toast.makeText(getBaseContext(), "ERROR - No se pudo crear el OutStream", Toast.LENGTH_SHORT).show();
-            }
-            //When activity is resumed, attempt to send a piece of junk data ('TEST') so that it will fail if not connected
-            // On this way the app doesn't have to wait for a user to press button to recognise connection failure
-            sendData("TEST");
+                System.out.println("fin hilo");
+                socket.close();
+            } catch (IOException e) { }
+        }
+
+        public BluetoothSocket getSocket(){
+            return socket;
         }
     }
 }
