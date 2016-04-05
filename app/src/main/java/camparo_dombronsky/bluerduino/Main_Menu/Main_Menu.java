@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import camparo_dombronsky.bluerduino.Car.Car_Setup;
+import camparo_dombronsky.bluerduino.Joystick.Joystick_Setup;
 import camparo_dombronsky.bluerduino.R;
 
 public class Main_Menu extends AppCompatActivity {
@@ -27,6 +28,16 @@ public class Main_Menu extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        btn_joystick = (Button) findViewById(R.id.btn_joystick);
+        btn_joystick.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                Intent intent = new Intent(Main_Menu.this, Joystick_Setup.class);
+                startActivity(intent);
+            }
+        });
+
+
 
 
     }

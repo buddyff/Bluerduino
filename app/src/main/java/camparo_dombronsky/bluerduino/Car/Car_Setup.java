@@ -14,6 +14,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,7 +23,6 @@ import android.widget.Toast;
 public class Car_Setup extends AppCompatActivity {
 
     // Widgets
-    TextView textConnectionStatus;
     Button start_car;
 
     // Objects for the Bluetooth Connection
@@ -42,10 +42,13 @@ public class Car_Setup extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.car_setup);
 
-        textConnectionStatus = (TextView) findViewById(R.id.connecting);
-        textConnectionStatus.setTextSize(40);
-
-        start_car = (Button) findViewById(R.id.start_car);
+        start_car = (Button) findViewById(R.id.btn_startCar);
+        start_car.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent intent = new Intent(Car_Setup.this, Car_Activity.class);
+                startActivity(intent);
+            }
+        });
 
 
 
@@ -58,7 +61,7 @@ public class Car_Setup extends AppCompatActivity {
         //It is best to check BT status at onResume in case something has changed while app was paused etc
         checkBTState();
 
-        textConnectionStatus.setText(" "); //makes the textview blank
+
 
         // Get a set of currently paired devices
         Set<BluetoothDevice> pairedDevices = btAdapter.getBondedDevices();
@@ -76,10 +79,6 @@ public class Car_Setup extends AppCompatActivity {
                     break;
                 }
             }
-            if (!arduino_founded)
-                textConnectionStatus.setText("No se encuentra el Arduino");
-        } else {
-            textConnectionStatus.setText("No hay nada emparejado guacho");
         }
     }
 
