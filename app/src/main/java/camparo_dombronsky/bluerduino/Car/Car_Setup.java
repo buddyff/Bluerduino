@@ -23,10 +23,10 @@ public class Car_Setup extends AppCompatActivity {
     Button start_car;
 
     // Objects for the Bluetooth Connection
-    private  BluetoothAdapter btAdapter;
+   // private  BluetoothAdapter btAdapter;
 
     //Thread
-    Connect2Arduino connect2arduino;
+    //Connect2Arduino connect2arduino;
 
 
     @Override
@@ -35,7 +35,6 @@ public class Car_Setup extends AppCompatActivity {
         setContentView(R.layout.car_setup);
 
         start_car = (Button) findViewById(R.id.btn_startCar);
-        start_car.setEnabled(false);
         start_car.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent intent = new Intent(Car_Setup.this, Car_Activity.class);
@@ -46,10 +45,10 @@ public class Car_Setup extends AppCompatActivity {
 
     @Override
     public void onResume() {
-        try {
+      //  try {
             super.onResume();
             //It is best to check BT status at onResume in case something has changed while app was paused etc
-            if (checkBTState()) {
+           /* if (checkBTState()) {
                 connect2arduino = new Connect2Arduino(btAdapter, this);
 
                 if (connect2arduino.getSocket() != null) {
@@ -62,7 +61,7 @@ public class Car_Setup extends AppCompatActivity {
         catch (IOException e){
             Toast.makeText(getBaseContext(), "No se pudo establecer conexión Bluetooth", Toast.LENGTH_SHORT).show();
             e.printStackTrace();
-        }
+        }*/
     }
 
     @Override
@@ -79,7 +78,7 @@ public class Car_Setup extends AppCompatActivity {
     public void onDestroy() {
         super.onDestroy();
         //Close BT socket to device
-        try {
+      /*  try {
             if (connect2arduino != null ) {
                 if (connect2arduino.getSocket() != null) {
                     connect2arduino.getSocket().close();
@@ -88,12 +87,12 @@ public class Car_Setup extends AppCompatActivity {
         }
         catch (IOException e2) {
             Toast.makeText(getBaseContext(), "ERROR - No se pudo cerrar el Socket Bluetooth", Toast.LENGTH_SHORT).show();
-        }
+        }*/
     }
 
     //method to check if the device has Bluetooth and if it is on.
     //Prompts the user to turn it on if it is off
-    private boolean checkBTState() {
+   /* private boolean checkBTState() {
         // Check if the device has Bluetooth and that it is turned on
         btAdapter = BluetoothAdapter.getDefaultAdapter();
         if (btAdapter == null) {
@@ -108,7 +107,7 @@ public class Car_Setup extends AppCompatActivity {
             }
         }
         return true;
-    }
+    }*/
 
 
 
