@@ -2,15 +2,12 @@ package camparo_dombronsky.bluerduino.Car;
 
 import camparo_dombronsky.bluerduino.R;
 import camparo_dombronsky.bluerduino.Utils.Connect2Arduino;
-import camparo_dombronsky.bluerduino.Utils.SocketServerThread;
+import camparo_dombronsky.bluerduino.Utils.ServerTask;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.ServerSocket;
-import java.net.Socket;
 import java.net.SocketException;
 import java.util.Enumeration;
 
@@ -23,10 +20,10 @@ import android.widget.Toast;
 
 public class Car_Activity extends AppCompatActivity {
 
-    TextView info, infoip, msg;
-    String message = "";
-    ServerSocket serverSocket;
-    Connect2Arduino connect2arduino;
+    private TextView info, infoip, msg;
+    private String message = "";
+    private ServerSocket serverSocket;
+    private Connect2Arduino connect2arduino;
     private BluetoothAdapter btAdapter;
 
     @Override
@@ -52,7 +49,7 @@ public class Car_Activity extends AppCompatActivity {
                     connect2arduino.start();
                     if (connect2arduino.getSocket().isConnected()) {
                         Toast.makeText(getBaseContext(), "Conexion con Arduino establecida correctamente", Toast.LENGTH_SHORT).show();
-                        Thread socketServerThread = new Thread(new SocketServerThread());
+                        ServerTask socketServerThread = new ServerTask(connect2arduino);
                         socketServerThread.start();
                     }
                 }

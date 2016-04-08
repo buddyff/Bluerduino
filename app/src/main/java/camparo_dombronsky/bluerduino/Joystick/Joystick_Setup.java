@@ -37,7 +37,7 @@ public class Joystick_Setup extends AppCompatActivity {
 
         buttonSend.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                myClientTask.sendData("C");
+                myClientTask.sendData("Comando guachoooo");
             }
         });
 

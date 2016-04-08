@@ -1,12 +1,8 @@
 package camparo_dombronsky.bluerduino.Utils;
 
 
-import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
@@ -15,49 +11,28 @@ import android.os.AsyncTask;
 
 public class ClientTask extends AsyncTask<Void, Void, Void> {
 
-    String dstAddress;
-    int dstPort;
-    String response = "";
-    Socket socket;
-    DataOutputStream dataOutputStream;
+    private String ip;
+    private int port;
+    private Socket socket;
+    private DataOutputStream dataOutputStream;
 
     public ClientTask(String addr, int port) {
-        dstAddress = addr;
-        dstPort = port;
+        ip = addr;
+        this.port = port;
     }
 
     @Override
     protected Void doInBackground(Void... arg0) {
         try {
-            socket = new Socket(dstAddress, dstPort);
-            System.out.println("Se conecto");
+            socket = new Socket(ip, port);
             dataOutputStream = new DataOutputStream(socket.getOutputStream());
-//            dataOutputStream.writeUTF("EEEESA GUACHO");
-
-
-
-
-
-        } catch (UnknownHostException e) {
-            // TODO Auto-generated catch block
+        }
+        catch (UnknownHostException e) {
             e.printStackTrace();
-            System.out.println("UnknownHostException");
-            //response = "UnknownHostException: " + e.toString();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
+        }
+        catch (IOException e) {
             e.printStackTrace();
-            System.out.println("IOException");
-            //response = "IOException: " + e.toString();
-        } /*finally {
-            if (socket != null) {
-                try {
-                    socket.close();
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-        }*/
+        }
         return null;
     }
 
@@ -69,42 +44,13 @@ public class ClientTask extends AsyncTask<Void, Void, Void> {
 
     public void sendData (String data){
         try {
-            dataOutputStream.writeUTF("ARSENAL F.C");
+            dataOutputStream.writeUTF(data);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    class SocketServerReplyThread extends Thread {
 
-        private Socket hostThreadSocket;
-        String data;
-
-        SocketServerReplyThread(Socket socket, String data) {
-            hostThreadSocket = socket;
-            this.data = data;
-        }
-
-        @Override
-        public void run() {
-            OutputStream outputStream;
-            String msgReply = "Hello from Android : " + data;
-
-            try {
-                outputStream = hostThreadSocket.getOutputStream();
-                PrintStream printStream = new PrintStream(outputStream);
-                printStream.print(msgReply);
-                printStream.close();
-
-
-
-            }
-            catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-    }
 
 
 }
