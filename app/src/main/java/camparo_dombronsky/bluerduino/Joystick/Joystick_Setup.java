@@ -1,46 +1,29 @@
 package camparo_dombronsky.bluerduino.Joystick;
 
 import camparo_dombronsky.bluerduino.R;
-import camparo_dombronsky.bluerduino.Utils.ClientTask;
+import camparo_dombronsky.bluerduino.Utils.JoystickTask;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.Socket;
-import java.net.UnknownHostException;
-
-import android.os.AsyncTask;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 public class Joystick_Setup extends AppCompatActivity {
 
-    EditText editTextAddress, editTextPort;
-    Button buttonConnect, buttonClear, buttonSend;
-    ClientTask myClientTask;
+    EditText ip;
+    Button buttonConnect;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.joystick_setup);
 
-        editTextAddress = (EditText)findViewById(R.id.address);
-        editTextPort = (EditText)findViewById(R.id.port);
+        ip = (EditText)findViewById(R.id.ip);
         buttonConnect = (Button)findViewById(R.id.connect);
-        buttonClear = (Button)findViewById(R.id.clear);
-        buttonSend = (Button)findViewById(R.id.send);
-
-        buttonSend.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                myClientTask.sendData("Comando guachoooo");
-            }
-        });
-
         buttonConnect.setOnClickListener(buttonConnectOnClickListener);
     }
 
@@ -49,10 +32,10 @@ public class Joystick_Setup extends AppCompatActivity {
 
                 @Override
                 public void onClick(View arg0) {
-                    myClientTask = new ClientTask(
-                            "192.168.10.29",
-                            7000);
-                    myClientTask.execute();
+                    Intent intent = new Intent(Joystick_Setup.this, Joystick_Activity.class);
+                    System.out.println(ip.getText());
+                    intent.putExtra("ip",ip.getText().toString());
+                    startActivity(intent);
                 }};
 
 
