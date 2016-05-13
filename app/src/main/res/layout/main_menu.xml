@@ -36,7 +36,7 @@
             android:id="@+id/btn_joystick"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingLeft="100dp"
+            android:paddingLeft="120dp"
             android:src="@drawable/gamepad"
             android:background="@null"/>
     </LinearLayout>
