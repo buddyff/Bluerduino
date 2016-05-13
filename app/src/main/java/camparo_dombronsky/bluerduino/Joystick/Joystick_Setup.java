@@ -1,7 +1,6 @@
 package camparo_dombronsky.bluerduino.Joystick;
 
 import camparo_dombronsky.bluerduino.R;
-import camparo_dombronsky.bluerduino.Utils.JoystickTask;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -33,7 +32,6 @@ public class Joystick_Setup extends AppCompatActivity {
                 @Override
                 public void onClick(View arg0) {
                     Intent intent = new Intent(Joystick_Setup.this, Joystick_Activity.class);
-                    System.out.println(ip.getText());
                     intent.putExtra("ip",ip.getText().toString());
                     startActivity(intent);
                 }};

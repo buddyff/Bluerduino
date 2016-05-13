@@ -3,21 +3,50 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="horizontal"
+    android:padding="10dp"
+    android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <Button
-        android:id="@+id/btn_car"
-        android:layout_width="220dp"
-        android:layout_height="150dp"
-        android:layout_gravity="bottom"
-        android:text="CAR"/>
 
-    <Button
-        android:id="@+id/btn_joystick"
-        android:layout_width="220dp"
-        android:layout_height="150dp"
-        android:layout_gravity="top"
-        android:text="JOISTIN"/>
+
+    <TextView
+        android:id="@+id/menu_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:textSize="200px"
+        android:text="Bluerduino"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:paddingTop="50dp"
+        >
+
+        <ImageButton
+            android:id="@+id/btn_car"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="100dp"
+            android:src="@drawable/camera"
+            android:background="@null"/>
+        <ImageButton
+            android:id="@+id/btn_joystick"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="100dp"
+            android:src="@drawable/gamepad"
+            android:background="@null"/>
+    </LinearLayout>
+
+
 </LinearLayout>
+
+
+
+
+
+
+

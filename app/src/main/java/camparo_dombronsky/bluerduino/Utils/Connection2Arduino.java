@@ -20,7 +20,7 @@ import java.util.logging.Handler;
 import camparo_dombronsky.bluerduino.Car.Car_Setup;
 import camparo_dombronsky.bluerduino.R;
 
-public class Connect2Arduino extends Thread {
+public class Connection2Arduino extends Thread {
     private BluetoothSocket socket;
     private BluetoothDevice device;
     private BluetoothAdapter adapter;
@@ -30,7 +30,7 @@ public class Connect2Arduino extends Thread {
     private static final String ARDUINO_MAC = "98:D3:35:00:98:52";
     private static final UUID ARDUINO_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
-    public Connect2Arduino(BluetoothAdapter adap, Activity act) throws IOException {
+    public Connection2Arduino(BluetoothAdapter adap, Activity act) throws IOException {
         adapter = adap;
         callerActivity = act;
 

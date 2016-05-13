@@ -1,20 +1,12 @@
 package camparo_dombronsky.bluerduino.Car;
 
 import camparo_dombronsky.bluerduino.R;
-import camparo_dombronsky.bluerduino.Utils.Connect2Arduino;
 
-import java.io.IOException;
-import java.util.Set;
-import java.util.UUID;
-
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 
 public class Car_Setup extends AppCompatActivity {
@@ -26,7 +18,7 @@ public class Car_Setup extends AppCompatActivity {
    // private  BluetoothAdapter btAdapter;
 
     //Thread
-    //Connect2Arduino connect2arduino;
+    //Connection2Arduino connect2arduino;
 
 
     @Override
@@ -49,7 +41,7 @@ public class Car_Setup extends AppCompatActivity {
             super.onResume();
             //It is best to check BT status at onResume in case something has changed while app was paused etc
            /* if (checkBTState()) {
-                connect2arduino = new Connect2Arduino(btAdapter, this);
+                connect2arduino = new Connection2Arduino(btAdapter, this);
 
                 if (connect2arduino.getSocket() != null) {
                     connect2arduino.start();

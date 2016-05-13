@@ -6,7 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
 
 import camparo_dombronsky.bluerduino.R;
-import camparo_dombronsky.bluerduino.Utils.JoystickTask;
+import camparo_dombronsky.bluerduino.Utils.Joystick_Thread;
 import camparo_dombronsky.bluerduino.Utils.Listeners.JoystickTaskListener;
 
 /**
@@ -14,7 +14,7 @@ import camparo_dombronsky.bluerduino.Utils.Listeners.JoystickTaskListener;
  */
 public class Joystick_Activity extends AppCompatActivity implements JoystickTaskListener {
 
-    JoystickTask joystick_task;
+    Joystick_Thread joystick_task;
     boolean isConnected = false;
     ImageView cameraImage;
 
@@ -27,7 +27,7 @@ public class Joystick_Activity extends AppCompatActivity implements JoystickTask
 
         Bundle bundle = getIntent().getExtras();
 
-        joystick_task = new JoystickTask((String)bundle.getString("ip"),7000,this);
+        joystick_task = new Joystick_Thread((String)bundle.getString("ip"),7000,this);
         joystick_task.execute();
     }
 

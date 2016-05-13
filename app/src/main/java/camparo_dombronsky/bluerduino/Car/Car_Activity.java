@@ -2,8 +2,8 @@ package camparo_dombronsky.bluerduino.Car;
 
 import camparo_dombronsky.bluerduino.R;
 import camparo_dombronsky.bluerduino.Utils.Listeners.CameraPreviewListener;
-import camparo_dombronsky.bluerduino.Utils.Connect2Arduino;
-import camparo_dombronsky.bluerduino.Utils.CarTask;
+import camparo_dombronsky.bluerduino.Utils.Connection2Arduino;
+import camparo_dombronsky.bluerduino.Utils.Car_Activity_Thread;
 import camparo_dombronsky.bluerduino.Utils.CameraPreview;
 import camparo_dombronsky.bluerduino.Utils.Listeners.CarTaskListener;
 
@@ -11,7 +11,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
-import java.net.ServerSocket;
 import java.net.SocketException;
 import java.util.Enumeration;
 
@@ -32,8 +31,8 @@ public class Car_Activity extends AppCompatActivity implements SurfaceHolder.Cal
     private TextView info, infoip, msg;
     private String message = "";
     //private ServerSocket serverSocket;
-    private CarTask car_task;
-    private Connect2Arduino connect2arduino;
+    private Car_Activity_Thread car_thread;
+    private Connection2Arduino connection2Arduino;
     private BluetoothAdapter btAdapter;
     private SurfaceView frameLayout;
     private Camera mCamera;
@@ -52,8 +51,6 @@ public class Car_Activity extends AppCompatActivity implements SurfaceHolder.Cal
 
         infoip.setText(getIpAddress());
 
-
-
         // Create our Preview view and set it as the content of our activity.
         frameLayout.getHolder().setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
         frameLayout.getHolder().addCallback(this);
@@ -65,33 +62,33 @@ public class Car_Activity extends AppCompatActivity implements SurfaceHolder.Cal
     @Override
     protected void onResume(){
          super.onResume();
-      //  try {
-            //It is best to check BT status at onResume in case something has changed while app was paused etc
-           // if (checkBTState()) {
-            //    connect2arduino = new Connect2Arduino(btAdapter, this);
+        try {
+           //It is best to check BT status at onResume in case something has changed while app was paused etc
+            if (checkBTState()) {
+                connection2Arduino = new Connection2Arduino(btAdapter, this);
 
-             //   if (connect2arduino.getSocket() != null) {
-               //     connect2arduino.start();
-                //    if (connect2arduino.getSocket().isConnected()) {
-                  //      Toast.makeText(getBaseContext(), "Conexion con Arduino establecida correctamente", Toast.LENGTH_SHORT).show();
-                       // car_task = new CarTask(connect2arduino,this);
-                        car_task = new CarTask(this);
-                        car_task.start();
-                   // }
-             //   }
-           // }
-    //    }
-      /*  catch (IOException e){
+                if (connection2Arduino.getSocket() != null) {
+                   connection2Arduino.start();
+                   if (connection2Arduino.getSocket().isConnected()) {
+                     Toast.makeText(getBaseContext(), "Conexion con Arduino establecida correctamente", Toast.LENGTH_SHORT).show();
+                        car_thread = new Car_Activity_Thread(connection2Arduino,this);
+                       // car_thread = new Car_Activity_Thread(this);
+                        car_thread.start();
+                    }
+                }
+            }
+        }
+        catch (IOException e){
             Toast.makeText(getBaseContext(), "No se pudo establecer conexión Bluetooth", Toast.LENGTH_SHORT).show();
             e.printStackTrace();
-        }*/
+        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
 
-        /*if (CarTask.getSocket() != null) {
+        /*if (Car_Activity_Thread.getSocket() != null) {
             try {
                 serverSocket.close();
             } catch (IOException e) {
@@ -169,14 +166,12 @@ public class Car_Activity extends AppCompatActivity implements SurfaceHolder.Cal
     @Override
     public void onPreviewTaken(Bitmap bitmap) {
         if (isConnected) {
-            System.out.println("flag 1");
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            System.out.println("flag 2");
-            //Todo : en vez de 100 hay que poner un selector de calidad de imagen como el de ioio
+
+            //Todo : en vez de 50 hay que poner un selector de calidad de imagen como el de ioio
             bitmap.compress(Bitmap.CompressFormat.JPEG, 50, bos);
-            System.out.println("flag 3");
-            car_task.sendImageData(bos.toByteArray());
-            System.out.println("Mande imagenes");
+
+            car_thread.sendImageData(bos.toByteArray());
         }
     }
 

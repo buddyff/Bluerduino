@@ -1,25 +1,15 @@
 package camparo_dombronsky.bluerduino.Utils;
 
-import android.widget.TextView;
-
-import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PrintStream;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
-import java.util.Enumeration;
 
-import camparo_dombronsky.bluerduino.R;
 import camparo_dombronsky.bluerduino.Utils.Listeners.CarTaskListener;
 
-public class CarTask extends Thread {
+public class Car_Activity_Thread extends Thread {
 
     static final int SocketServerPORT = 7000;
     ServerSocket serverSocket;
@@ -28,14 +18,14 @@ public class CarTask extends Thread {
     DataOutputStream dataOutputStream;
     OutputStream out;
 
-    Connect2Arduino btConnection;
+    Connection2Arduino btConnection;
 
-    public CarTask(Connect2Arduino bt,CarTaskListener ctl){
+    public Car_Activity_Thread(Connection2Arduino bt, CarTaskListener ctl){
         btConnection = bt;
         listener = ctl;
     }
 
-    public CarTask(CarTaskListener ctl){
+    public Car_Activity_Thread(CarTaskListener ctl){
         listener = ctl;
     }
 
@@ -46,7 +36,9 @@ public class CarTask extends Thread {
             serverSocket = new ServerSocket(SocketServerPORT);
             Socket socket = null;
             String messageFromClient = "";
+
             while (true) {
+
                 //This block will be executed just the first time to establish the connection
                 if (socket == null) {
                     socket = serverSocket.accept();
@@ -55,14 +47,11 @@ public class CarTask extends Thread {
                     dataOutputStream = new DataOutputStream(socket.getOutputStream());
                     out = socket.getOutputStream();
                 }
-                //System.out.println("itero");
-                //
 
                 //If no message sent from client, this code will block the program
                 messageFromClient = dataInputStream.readUTF();
 
-                //btConnection.sendData(messageFromClient);
-
+                btConnection.sendData(messageFromClient);
             }
         } catch (IOException e) {
             // TODO Auto-generated catch block
