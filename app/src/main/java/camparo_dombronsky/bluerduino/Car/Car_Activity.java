@@ -2,20 +2,25 @@ package camparo_dombronsky.bluerduino.Car;
 
 import camparo_dombronsky.bluerduino.R;
 import camparo_dombronsky.bluerduino.Utils.Listeners.CameraPreviewListener;
-import camparo_dombronsky.bluerduino.Utils.Connection2Arduino;
 import camparo_dombronsky.bluerduino.Utils.Car_Activity_Thread;
 import camparo_dombronsky.bluerduino.Utils.CameraPreview;
 import camparo_dombronsky.bluerduino.Utils.Listeners.CarTaskListener;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
+import java.util.Set;
+import java.util.UUID;
 
 
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.hardware.Camera;
@@ -32,12 +37,20 @@ public class Car_Activity extends AppCompatActivity implements SurfaceHolder.Cal
     private String message = "";
     //private ServerSocket serverSocket;
     private Car_Activity_Thread car_thread;
-    private Connection2Arduino connection2Arduino;
     private BluetoothAdapter btAdapter;
     private SurfaceView frameLayout;
     private Camera mCamera;
     private CameraPreview mPreview;
     private boolean isConnected = false;
+
+    //ATRIBUTOS DE CONNECTION2ARDUINO
+    private BluetoothSocket btSocket;
+    private BluetoothDevice device;
+    private OutputStream outStream;
+    private Activity callerActivity;
+
+    private static final String ARDUINO_MAC = "98:D3:35:00:98:52";
+    private static final UUID ARDUINO_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,26 +70,47 @@ public class Car_Activity extends AppCompatActivity implements SurfaceHolder.Cal
 
         mPreview = new CameraPreview(this);
 
+        //-------------------------------------------
+        //It is best to check BT status at onResume in case something has changed while app was paused etc
+        if(checkBTState()) {
+
+            // Get a set of currently paired devices
+            Set<BluetoothDevice> pairedDevices = btAdapter.getBondedDevices();
+
+            // Look for the Arduino Bluetooth Device
+            if (pairedDevices.size() > 0) {
+                for (BluetoothDevice paired_device : pairedDevices) {
+                    if (paired_device.getAddress().equals(ARDUINO_MAC)) {
+                        device = paired_device;
+                        break;
+                    }
+                }
+            }
+            if (device != null)
+                try {
+                    btSocket = device.createRfcommSocketToServiceRecord(ARDUINO_UUID);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            else {
+                Toast.makeText(callerActivity, "El dispositivo Bluetooth del Arduino no se encuentra emparejado", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     @Override
     protected void onResume(){
          super.onResume();
         try {
-           //It is best to check BT status at onResume in case something has changed while app was paused etc
-            if (checkBTState()) {
-                connection2Arduino = new Connection2Arduino(btAdapter, this);
+                if (btSocket != null) {
+                    btAdapter.cancelDiscovery();
+                    btSocket.connect();
+                    outStream = btSocket.getOutputStream();
+                    Toast.makeText(getBaseContext(), "Conexion con Arduino establecida correctamente", Toast.LENGTH_SHORT).show();
 
-                if (connection2Arduino.getSocket() != null) {
-                   connection2Arduino.start();
-                   if (connection2Arduino.getSocket().isConnected()) {
-                     Toast.makeText(getBaseContext(), "Conexion con Arduino establecida correctamente", Toast.LENGTH_SHORT).show();
-                        car_thread = new Car_Activity_Thread(connection2Arduino,this);
-                       // car_thread = new Car_Activity_Thread(this);
-                        car_thread.start();
-                    }
+                    car_thread = new Car_Activity_Thread(outStream, this);
+                    car_thread.start();
                 }
-            }
         }
         catch (IOException e){
             Toast.makeText(getBaseContext(), "No se pudo establecer conexión Bluetooth", Toast.LENGTH_SHORT).show();

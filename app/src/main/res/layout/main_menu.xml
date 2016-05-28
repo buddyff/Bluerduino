@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:src="@drawable/camera"
-            android:background="@null"/>
+            android:background="@null" />
         <ImageButton
             android:id="@+id/btn_joystick"
             android:layout_width="wrap_content"

@@ -74,7 +74,6 @@ public class Connection2Arduino extends Thread {
                 }
                 });
 
-
         }
         catch (IOException connectException) {
             // Unable to connect; close the socket,toast a message and get out

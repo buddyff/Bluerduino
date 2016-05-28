@@ -16,12 +16,11 @@ public class Car_Activity_Thread extends Thread {
     CarTaskListener listener;
     DataInputStream dataInputStream = null;
     DataOutputStream dataOutputStream;
-    OutputStream out;
+    OutputStream out,btOut;
 
-    Connection2Arduino btConnection;
 
-    public Car_Activity_Thread(Connection2Arduino bt, CarTaskListener ctl){
-        btConnection = bt;
+    public Car_Activity_Thread(OutputStream out, CarTaskListener ctl){
+        btOut = out;
         listener = ctl;
     }
 
@@ -50,8 +49,8 @@ public class Car_Activity_Thread extends Thread {
 
                 //If no message sent from client, this code will block the program
                 messageFromClient = dataInputStream.readUTF();
-
-                btConnection.sendData(messageFromClient);
+                byte[] msgBuffer = messageFromClient.getBytes();
+                btOut.write(msgBuffer);
             }
         } catch (IOException e) {
             // TODO Auto-generated catch block
