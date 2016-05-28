@@ -10,15 +10,40 @@
         android:layout_height="match_parent"
         android:contentDescription="@null" />
 
-    <Button
-        android:id="@+id/mandarA"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="A..."/>
 
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:paddingTop="250dp">
 
+        <Button
+            android:id="@+id/left"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Izquierda"/>
 
+        <Button
+            android:id="@+id/right"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Derecha"/>
 
+        <Button
+            android:id="@+id/backward"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Reversa"/>
 
-
+        <Button
+            android:id="@+id/forward"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Acelerar"
+            />
+    </LinearLayout>
 </RelativeLayout>

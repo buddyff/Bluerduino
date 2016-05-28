@@ -3,7 +3,9 @@ package camparo_dombronsky.bluerduino.Joystick;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.v4.view.MotionEventCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -21,18 +23,32 @@ public class Joystick_Activity extends AppCompatActivity implements JoystickTask
     boolean isConnected = false;
     ImageView cameraImage;
 
-    Button A,G;
+    Button left,right,forward,backward;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.joystick_activity);
 
-        A = (Button) findViewById(R.id.mandarA);
-        //G = (Button) findViewById(R.id.mandarG);
+        left = (Button) findViewById(R.id.left);
+        right = (Button) findViewById(R.id.right);
+        forward = (Button) findViewById(R.id.forward);
+        backward = (Button) findViewById(R.id.backward);
 
-        A.setOnClickListener(mandarAListener);
-      //  G.setOnClickListener(mandarGListener);
+        forward.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                int action = MotionEventCompat.getActionMasked(event);
+                if (action == MotionEvent.ACTION_DOWN)
+                    joystick_task.sendData("A");
+                else
+                if (action == MotionEvent.ACTION_UP)
+                    joystick_task.sendData("G");
+
+                return true;
+            }
+        });
+
 
         cameraImage = (ImageView) findViewById(R.id.iv_camera_image);
 
@@ -42,23 +58,6 @@ public class Joystick_Activity extends AppCompatActivity implements JoystickTask
         joystick_task.execute();
     }
 
-        View.OnClickListener mandarAListener =
-            new View.OnClickListener(){
-
-                @Override
-                public void onClick(View arg0) {
-                    joystick_task.sendData("A");
-
-            }};
-
-    View.OnClickListener mandarGListener=
-            new View.OnClickListener(){
-
-                @Override
-                public void onClick(View arg0) {
-                    joystick_task.sendData("G");
-
-                }};
 
 
     @Override
