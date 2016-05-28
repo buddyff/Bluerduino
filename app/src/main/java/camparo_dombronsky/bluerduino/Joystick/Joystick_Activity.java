@@ -1,8 +1,11 @@
 package camparo_dombronsky.bluerduino.Joystick;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 
 import camparo_dombronsky.bluerduino.R;
@@ -18,10 +21,18 @@ public class Joystick_Activity extends AppCompatActivity implements JoystickTask
     boolean isConnected = false;
     ImageView cameraImage;
 
+    Button A,G;
+
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.joystick_activity);
+
+        A = (Button) findViewById(R.id.mandarA);
+        //G = (Button) findViewById(R.id.mandarG);
+
+        A.setOnClickListener(mandarAListener);
+      //  G.setOnClickListener(mandarGListener);
 
         cameraImage = (ImageView) findViewById(R.id.iv_camera_image);
 
@@ -30,6 +41,25 @@ public class Joystick_Activity extends AppCompatActivity implements JoystickTask
         joystick_task = new Joystick_Thread((String)bundle.getString("ip"),7000,this);
         joystick_task.execute();
     }
+
+        View.OnClickListener mandarAListener =
+            new View.OnClickListener(){
+
+                @Override
+                public void onClick(View arg0) {
+                    joystick_task.sendData("A");
+
+            }};
+
+    View.OnClickListener mandarGListener=
+            new View.OnClickListener(){
+
+                @Override
+                public void onClick(View arg0) {
+                    joystick_task.sendData("G");
+
+                }};
+
 
     @Override
     public void onControllerConnected() {

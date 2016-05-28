@@ -31,14 +31,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:src="@drawable/camera"
+            android:src="@drawable/wheel"
             android:background="@null" />
         <ImageButton
             android:id="@+id/btn_joystick"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:src="@drawable/gamepad"
+            android:src="@drawable/console"
             android:background="@null"/>
     </LinearLayout>
 
