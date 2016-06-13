@@ -15,7 +15,7 @@ import android.os.AsyncTask;
 import camparo_dombronsky.bluerduino.Utils.Listeners.JoystickTaskListener;
 
 
-public class Joystick_Thread extends AsyncTask<Void, Void, Void> {
+public class Joystick_Activity_Thread extends AsyncTask<Void, Void, Void> {
 
     private String ip;
     private int port;
@@ -25,7 +25,7 @@ public class Joystick_Thread extends AsyncTask<Void, Void, Void> {
     private JoystickTaskListener listener;
     private Activity joystick_activity;
 
-    public Joystick_Thread(String addr, int port, JoystickTaskListener list) {
+    public Joystick_Activity_Thread(String addr, int port, JoystickTaskListener list) {
         ip = addr;
         this.port = port;
         listener = list;
