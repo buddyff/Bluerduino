@@ -2,13 +2,10 @@ package camparo_dombronsky.bluerduino.Joystick;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.v4.view.MotionEventCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.view.MotionEvent;
-import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
+import android.widget.SeekBar;
 
 import camparo_dombronsky.bluerduino.R;
 import camparo_dombronsky.bluerduino.Utils.Joystick_Activity_Thread;
@@ -17,32 +14,32 @@ import camparo_dombronsky.bluerduino.Utils.Listeners.JoystickTaskListener;
 /**
  * Created by rcamparo on 13/04/2016.
  */
-public class Joystick_Activity extends AppCompatActivity implements JoystickTaskListener, JoyStickManager.JoyStickEventListener {
+public class Joystick_Activity extends AppCompatActivity implements JoystickTaskListener {
     private Joystick_Activity_Thread joystick_task;
     private boolean isConnected = false;
     private ImageView cameraImage;
-    private RelativeLayout joystick;
-    private JoyStickManager joystickManager;
-    private Button left,right,forward,backward;
+    private Button forward,backward;
+    private SeekBar direction;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.joystick_activity);
 
-        /*left = (Button) findViewById(R.id.left);
-        right = (Button) findViewById(R.id.right);
         forward = (Button) findViewById(R.id.forward);
-        backward = (Button) findViewById(R.id.backward);*/
+        backward = (Button) findViewById(R.id.backward);
+        direction = (SeekBar) findViewById(R.id.direction);
 
-      /*  joystick = (RelativeLayout) findViewById(R.id.joystick);
-        joystickManager = new JoyStickManager(this, joystick, getWindowManager().getDefaultDisplay().getHeight());
-        joystickManager.setJoyStickEventListener(this);*/
+        cameraImage = (ImageView) findViewById(R.id.iv_camera_image);
+
+//        direction.
+
         /*  0 : DETENERSE
             1 : ADELANTE
             2 : ATRAS
             3 : DERECHA
             4 : IZQUIERDA */
+
         /*forward.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -58,7 +55,7 @@ public class Joystick_Activity extends AppCompatActivity implements JoystickTask
         });
         */
 
-        cameraImage = (ImageView) findViewById(R.id.iv_camera_image);
+
 
         Bundle bundle = getIntent().getExtras();
 
@@ -78,49 +75,6 @@ public class Joystick_Activity extends AppCompatActivity implements JoystickTask
         cameraImage.setImageBitmap(bitmap);
     }
 
-    @Override
-    public void onJoyStickUp(int speed) {
 
-    }
-
-    @Override
-    public void onJoyStickUpRight(int speed) {
-
-    }
-
-    @Override
-    public void onJoyStickUpLeft(int speed) {
-
-    }
-
-    @Override
-    public void onJoyStickDown(int speed) {
-
-    }
-
-    @Override
-    public void onJoyStickDownRight(int speed) {
-
-    }
-
-    @Override
-    public void onJoyStickDownLeft(int speed) {
-
-    }
-
-    @Override
-    public void onJoyStickRight(int speed) {
-
-    }
-
-    @Override
-    public void onJoyStickLeft(int speed) {
-
-    }
-
-    @Override
-    public void onJoyStickNone() {
-
-    }
 
 }
