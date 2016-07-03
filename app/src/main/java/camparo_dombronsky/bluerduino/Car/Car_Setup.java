@@ -27,6 +27,7 @@ public class Car_Setup extends AppCompatActivity {
         setContentView(R.layout.car_setup);
 
         start_car = (Button) findViewById(R.id.btn_startCar);
+        start_car.setEnabled(false);
         start_car.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent intent = new Intent(Car_Setup.this, Car_Activity.class);

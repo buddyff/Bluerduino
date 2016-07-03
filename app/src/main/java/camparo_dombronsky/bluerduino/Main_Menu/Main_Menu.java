@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import camparo_dombronsky.bluerduino.Car.Car_Activity;
 import camparo_dombronsky.bluerduino.Car.Car_Setup;
 import camparo_dombronsky.bluerduino.Joystick.Joystick_Setup;
 import camparo_dombronsky.bluerduino.R;
@@ -34,7 +35,7 @@ public class Main_Menu extends Activity {
         btn_car = (ImageButton) findViewById(R.id.btn_car);
         btn_car.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                Intent intent = new Intent(Main_Menu.this, Car_Setup.class);
+                Intent intent = new Intent(Main_Menu.this, Car_Activity.class);
                 startActivity(intent);
             }
         });

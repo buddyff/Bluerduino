@@ -35,6 +35,7 @@ public class Car_Activity extends AppCompatActivity implements SurfaceHolder.Cal
 
     private TextView info, infoip, msg;
     private String message = "";
+
     //private ServerSocket serverSocket;
     private Car_Activity_Thread car_thread;
     private BluetoothAdapter btAdapter;
