@@ -4,20 +4,22 @@
     android:layout_height="match_parent"
     android:layout_centerHorizontal="true"
     android:layout_centerVertical="true"
-    android:layout_margin="30dp"
     android:focusable="true"
     android:focusableInTouchMode="true"
     android:gravity="center"
-    android:orientation="vertical" >
-    <requestFocus />
+    android:background="@drawable/wallpaper"
+    android:orientation="vertical">
+
 
     <Button
         android:id="@+id/btn_startCar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="104dp"
         android:text="Connect" />
+
+
+
 
 
 

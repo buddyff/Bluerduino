@@ -38,6 +38,9 @@
             android:id="@+id/direction"
             android:max="510"
             android:progress="255"
+            android:thumb="@drawable/wheel"
+            android:maxHeight="100dp"
+            android:minHeight="100dp"
             />
     </LinearLayout>
 
