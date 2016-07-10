@@ -3,7 +3,8 @@
     xmlns:rsb="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:splitMotionEvents="true">
 
     <ImageView
         android:id="@+id/iv_camera_image"
@@ -11,60 +12,51 @@
         android:layout_height="match_parent"
         android:contentDescription="@null" />
 
-    <!--<RelativeLayout
-        android:id="@+id/joystick"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_margin="30dp"
-        android:background="@drawable/circular_joystick" >
-    </RelativeLayout>-->
-
     <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal"
-        android:gravity="left"
-        android:paddingBottom="20dp"
-        android:paddingLeft="20dp">
-
-
-        <SeekBar
-            android:layout_width="250dp"
-            android:layout_height="100dp"
-            android:layout_gravity="bottom"
-            android:id="@+id/direction"
-            android:max="510"
-            android:progress="255"
-            android:thumb="@drawable/wheel"
-            android:maxHeight="100dp"
-            android:minHeight="100dp"
-            />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:orientation="horizontal"
         android:gravity="right"
         android:paddingBottom="30dp"
-        android:paddingRight="20dp">
+        android:paddingRight="20dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+
+
+        <SeekBar
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:id="@+id/direction"
+            android:max="510"
+            android:layout_weight="2.5"
+            android:progress="255"
+            android:thumb="@drawable/wheel"
+            android:maxHeight="100dp"
+            android:minHeight="100dp"
+            android:indeterminate="false" />
 
         <Button
             android:id="@+id/backward"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:text="Reversa"/>
+            android:text="Reversa"
+            android:layout_marginLeft="50dp"
+            android:layout_weight="1" />
 
         <Button
             android:id="@+id/forward"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:text="Acelerar"
-            />
+            android:layout_weight="1" />
     </LinearLayout>
+
+
+
+
 </RelativeLayout>

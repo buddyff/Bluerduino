@@ -52,6 +52,7 @@ public class Car_Activity_Thread extends Thread {
                 messageFromClient = dataInputStream.readUTF();
                 byte[] msgBuffer = messageFromClient.getBytes();
                 btOut.write(msgBuffer);
+                btOut.flush();
 
             }
         } catch (IOException e) {
