@@ -73,10 +73,10 @@ public class Joystick_Activity_Thread extends AsyncTask<Void, Void, Void> {
         super.onPostExecute(result);
     }*/
 
-    public void sendData (int data){
+    public void sendData (String data){
         try {
-            //dataOutputStream.writeUTF(data);
-            dataOutputStream.writeInt(data);
+            dataOutputStream.writeUTF(data);
+            //dataOutputStream.writeInt(data);
         } catch (IOException e) {
             e.printStackTrace();
         }

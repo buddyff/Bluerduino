@@ -46,9 +46,9 @@ public class Joystick_Activity extends AppCompatActivity implements JoystickTask
             public boolean onTouch(View v, MotionEvent event) {
                 int action = MotionEventCompat.getActionMasked(event);
                 if (action == MotionEvent.ACTION_DOWN)
-                    joystick_task.sendData(1000);
+                    joystick_task.sendData("1000");
                 else if (action == MotionEvent.ACTION_UP)
-                    joystick_task.sendData(5000);
+                    joystick_task.sendData("5000");
                 return true;
             }
         });
@@ -59,26 +59,28 @@ public class Joystick_Activity extends AppCompatActivity implements JoystickTask
             public boolean onTouch(View v, MotionEvent event) {
                 int action = MotionEventCompat.getActionMasked(event);
                 if (action == MotionEvent.ACTION_DOWN)
-                    joystick_task.sendData(2000);
+                   joystick_task.sendData("2000");
                 else
                 if (action == MotionEvent.ACTION_UP)
-                    joystick_task.sendData(5000);
+                    joystick_task.sendData("5000");
                 return true;
             }
         });
 
         //Direction Listener
-        direction.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        /*direction.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (progress > 255)
-                    joystick_task.sendData(3000+progress-255);
+                if (progress > 255){
+                   joystick_task.sendData(3000+progress-255);
+                }
+
                 else
                     if(progress < 255){
                         joystick_task.sendData(4000+progress);
                     }
                     else
-                        joystick_task.sendData(3000);
+                       joystick_task.sendData(3000);
 
             }
 
@@ -91,15 +93,8 @@ public class Joystick_Activity extends AppCompatActivity implements JoystickTask
             public void onStopTrackingTouch(SeekBar seekBar) {
 
             }
-        });
+        });*/
 
-//        direction.
-
-        /*  0 : DETENERSE
-            1 : ADELANTE
-            2 : ATRAS
-            3 : DERECHA
-            4 : IZQUIERDA */
 
 
 
