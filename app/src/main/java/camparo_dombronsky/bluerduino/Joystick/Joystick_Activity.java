@@ -2,7 +2,10 @@ package camparo_dombronsky.bluerduino.Joystick;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.v4.view.MotionEventCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -32,6 +35,64 @@ public class Joystick_Activity extends AppCompatActivity implements JoystickTask
 
         cameraImage = (ImageView) findViewById(R.id.iv_camera_image);
 
+        Bundle bundle = getIntent().getExtras();
+        joystick_task = new Joystick_Activity_Thread((String)bundle.getString("ip"),7000,this);
+        joystick_task.execute();
+
+
+        //Forward Listener
+        forward.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                int action = MotionEventCompat.getActionMasked(event);
+                if (action == MotionEvent.ACTION_DOWN)
+                    joystick_task.sendData(1000);
+                else if (action == MotionEvent.ACTION_UP)
+                    joystick_task.sendData(5000);
+                return true;
+            }
+        });
+
+        //Backward Listener
+        backward.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                int action = MotionEventCompat.getActionMasked(event);
+                if (action == MotionEvent.ACTION_DOWN)
+                    joystick_task.sendData(2000);
+                else
+                if (action == MotionEvent.ACTION_UP)
+                    joystick_task.sendData(5000);
+                return true;
+            }
+        });
+
+        //Direction Listener
+        direction.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (progress > 255)
+                    joystick_task.sendData(3000+progress-255);
+                else
+                    if(progress < 255){
+                        joystick_task.sendData(4000+progress);
+                    }
+                    else
+                        joystick_task.sendData(3000);
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
 //        direction.
 
         /*  0 : DETENERSE
@@ -40,27 +101,12 @@ public class Joystick_Activity extends AppCompatActivity implements JoystickTask
             3 : DERECHA
             4 : IZQUIERDA */
 
-        /*forward.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                int action = MotionEventCompat.getActionMasked(event);
-                if (action == MotionEvent.ACTION_DOWN)
-                    joystick_task.sendData("A");
-                else
-                if (action == MotionEvent.ACTION_UP)
-                    joystick_task.sendData("G");
-
-                return true;
-            }
-        });
-        */
 
 
 
-        Bundle bundle = getIntent().getExtras();
 
-       // joystick_task = new Joystick_Activity_Thread((String)bundle.getString("ip"),7000,this);
-       // joystick_task.execute();
+
+
     }
 
 

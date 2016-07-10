@@ -34,7 +34,7 @@ public class Car_Activity_Thread extends Thread {
         try {
             serverSocket = new ServerSocket(SocketServerPORT);
             Socket socket = null;
-            String messageFromClient = "";
+            int messageFromClient;
 
             while (true) {
 
@@ -48,9 +48,10 @@ public class Car_Activity_Thread extends Thread {
                 }
 
                 //If no message sent from client, this code will block the program
-                messageFromClient = dataInputStream.readUTF();
-                byte[] msgBuffer = messageFromClient.getBytes();
-                btOut.write(msgBuffer);
+                messageFromClient = dataInputStream.readInt();
+                //byte[] msgBuffer = messageFromClient.getBytes();
+                btOut.write(messageFromClient);
+
             }
         } catch (IOException e) {
             // TODO Auto-generated catch block
