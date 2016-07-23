@@ -7,7 +7,10 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:orientation="vertical"
-    tools:context=".MainActivity" >
+    android:columnCount="2"
+    android:rowCount="1"
+    tools:context=".MainActivity"
+    android:background="@drawable/wallpaper">
 
     <EditText
         android:id="@+id/ip"
@@ -19,7 +22,10 @@
         android:id="@+id/connect"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Connect..."/>
+        android:columnCount="8"
+        android:layout_column="0"
+        android:orientation="horizontal"
+        android:rowCount="6" >
 
 
 </LinearLayout>
