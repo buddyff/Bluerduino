@@ -9,12 +9,14 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 public class Joystick_Setup extends AppCompatActivity {
 
     TextView ip;
-    Button buttonConnect,btn1,btn2,btn3,btn4,btn5,btn6,btn7,btn8,btn9,btn0,btnD,btnE;
+    ImageButton buttonConnect;
+    Button btn1,btn2,btn3,btn4,btn5,btn6,btn7,btn8,btn9,btn0,btnD,btnE;
 
 
     @Override
@@ -23,7 +25,7 @@ public class Joystick_Setup extends AppCompatActivity {
         setContentView(R.layout.joystick_setup);
 
         ip = (TextView)findViewById(R.id.ip);
-        buttonConnect = (Button)findViewById(R.id.connect);
+        buttonConnect = (ImageButton)findViewById(R.id.connect);
         buttonConnect.setOnClickListener(buttonConnectOnClickListener);
 
         btn1 = (Button)findViewById(R.id.btn1);
