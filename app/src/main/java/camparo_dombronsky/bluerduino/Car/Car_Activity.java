@@ -21,17 +21,23 @@ import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.hardware.Camera;
 import android.os.Bundle;
+import android.os.PowerManager;
+import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class Car_Activity extends AppCompatActivity implements SurfaceHolder.Callback,CameraPreviewListener,CarTaskListener {
+public class Car_Activity extends AppCompatActivity implements SurfaceHolder.Callback{
 
     private TextView info, infoip, msg;
     private String message = "";
@@ -40,15 +46,15 @@ public class Car_Activity extends AppCompatActivity implements SurfaceHolder.Cal
     private Car_Activity_Thread car_thread;
     private BluetoothAdapter btAdapter;
     private SurfaceView frameLayout;
-    private Camera mCamera;
-    private CameraPreview mPreview;
+    //private CameraPreview mPreview;
     private boolean isConnected = false;
 
     //ATRIBUTOS DE CONNECTION2ARDUINO
     private BluetoothSocket btSocket;
     private BluetoothDevice device;
-    private OutputStream outStream;
-
+    //private OutputStream outStream;
+    boolean isTurnedOn = true;
+    ImageButton prendeApaga;
 
     private static final String ARDUINO_MAC = "98:D3:35:00:98:52";
     private static final UUID ARDUINO_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
@@ -61,30 +67,42 @@ public class Car_Activity extends AppCompatActivity implements SurfaceHolder.Cal
         infoip = (TextView) findViewById(R.id.ip_address);
         infoip.setText(getIpAddress());
 
-        frameLayout= (SurfaceView) findViewById(R.id.camera_preview);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        infoip.setText(getIpAddress());
+        frameLayout = (SurfaceView) findViewById(R.id.camera_preview);
+
 
         // Create our Preview view and set it as the content of our activity.
         frameLayout.getHolder().setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
         frameLayout.getHolder().addCallback(this);
 
-        mPreview = new CameraPreview(this);
-
+        prendeApaga = (ImageButton) findViewById(R.id.btn_prende_apaga);
+        prendeApaga.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                if(isTurnedOn){
+                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                    isTurnedOn = false;
+                    //prendeApaga.setBackground();
+                    Toast.makeText(getBaseContext(), "La pantalla se apagara pronto", Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                    isTurnedOn = true;
+                    Toast.makeText(getBaseContext(), "La pantalla permanecera encendida", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        //mPreview = new CameraPreview(this);
     }
 
     @Override
-    protected void onResume(){
-         super.onResume();
+    protected void onResume() {
+        super.onResume();
         try {
             //It is best to check BT status at onResume in case something has changed while app was paused etc
-            if(checkBTState()) {
-
-                // ---------------- ESTO REEMPLAZA A la clase Connection2Arduino-------------
-
+            if (checkBTState()) {
                 // Get a set of currently paired devices
                 Set<BluetoothDevice> pairedDevices = btAdapter.getBondedDevices();
-
                 // Look for the Arduino Bluetooth Device
                 if (pairedDevices.size() > 0) {
                     for (BluetoothDevice paired_device : pairedDevices) {
@@ -98,6 +116,7 @@ public class Car_Activity extends AppCompatActivity implements SurfaceHolder.Cal
                     try {
                         //Create an RFCOMM BluetoothSocket ready to start a secure outgoing connection to this remote device
                         btSocket = device.createRfcommSocketToServiceRecord(ARDUINO_UUID);
+                        System.out.println("Creo el socket bluetooth");
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -107,18 +126,32 @@ public class Car_Activity extends AppCompatActivity implements SurfaceHolder.Cal
 
                 //------------------------------------------------------------------------------
             }
+            System.out.println("Socket conectado : "+ btSocket.toString());
+            if (btSocket != null && !btSocket.isConnected()) {
+                try {
+                    System.out.println("Voy a conectar el bluetooth");
+                    btAdapter.cancelDiscovery();
+                    btSocket.connect();
+                    System.out.println("Conecto el bluetooth");
+                    //outStream = btSocket.getOutputStream();
+                    Toast.makeText(getBaseContext(), "Conexion con Arduino establecida correctamente", Toast.LENGTH_SHORT).show();
 
-            if (btSocket != null) {
-                btAdapter.cancelDiscovery();
-                btSocket.connect();
-                outStream = btSocket.getOutputStream();
-                Toast.makeText(getBaseContext(), "Conexion con Arduino establecida correctamente", Toast.LENGTH_SHORT).show();
-
-                car_thread = new Car_Activity_Thread(outStream, this);
-                car_thread.start();
+                    if (car_thread == null) {
+                        car_thread = new Car_Activity_Thread(btSocket);
+                        car_thread.execute();
+                    } else
+                        car_thread.setBluetoothSocket(btSocket);
+                }
+                catch (IOException e){e.printStackTrace();}
             }
-        }
-        catch (IOException e){
+
+            if(car_thread == null) {
+                System.out.println("Creo el thread con socket null "+ btSocket);
+                car_thread = new Car_Activity_Thread(btSocket);
+                car_thread.execute();
+            }
+
+        } catch (Exception e) {
             Toast.makeText(getBaseContext(), "No se pudo establecer conexión Bluetooth", Toast.LENGTH_SHORT).show();
             e.printStackTrace();
         }
@@ -189,7 +222,7 @@ public class Car_Activity extends AppCompatActivity implements SurfaceHolder.Cal
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        mPreview.createCameraInstance(holder);
+        car_thread.createCameraInstance(holder);
     }
 
     @Override
@@ -202,26 +235,15 @@ public class Car_Activity extends AppCompatActivity implements SurfaceHolder.Cal
 
     }
 
-
-    @Override
-    public void onPreviewTaken(Bitmap bitmap) {
-        if (isConnected) {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-
-            //Todo : en vez de 50 hay que poner un selector de calidad de imagen como el de ioio
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 50, bos);
-
-            car_thread.sendImageData(bos.toByteArray());
+    private void prendeApagaListener(){
+        if(isTurnedOn){
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON);
+            isTurnedOn = false;
+        }
+        else{
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            isTurnedOn = true;
         }
     }
 
-    @Override
-    public void onPreviewOutOfMemory(OutOfMemoryError e) {
-
-    }
-
-    @Override
-    public void onControllerConnected() {
-        isConnected = true;
-    }
 }

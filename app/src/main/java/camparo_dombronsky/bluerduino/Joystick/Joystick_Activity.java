@@ -6,6 +6,7 @@ import android.support.v4.view.MotionEventCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -21,13 +22,15 @@ public class Joystick_Activity extends AppCompatActivity implements JoystickTask
     private Joystick_Activity_Thread joystick_task;
     private boolean isConnected = false;
     private ImageView cameraImage;
-    private Button forward,backward;
+    private Button forward, backward;
     private SeekBar direction;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.joystick_activity);
+
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         forward = (Button) findViewById(R.id.forward);
         backward = (Button) findViewById(R.id.backward);
@@ -37,16 +40,13 @@ public class Joystick_Activity extends AppCompatActivity implements JoystickTask
 
         Bundle bundle = getIntent().getExtras();
 
-//        joystick_task = new Joystick_Activity_Thread((String)bundle.getString("ip"),7000,this);
-        //      joystick_task.execute();
-
-
+        joystick_task = new Joystick_Activity_Thread((String) bundle.getString("ip"), 7000, this);
 
         //Forward Listener
-       forward.setOnTouchListener(new View.OnTouchListener() {
+        forward.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-               int action = MotionEventCompat.getActionMasked(event);
+                int action = MotionEventCompat.getActionMasked(event);
                 switch (action) {
                     case MotionEvent.ACTION_DOWN:
                         joystick_task.sendData("1000");
@@ -59,8 +59,8 @@ public class Joystick_Activity extends AppCompatActivity implements JoystickTask
             }
         });
 
-       //Backward Listener
-       backward.setOnTouchListener(new View.OnTouchListener() {
+        //Backward Listener
+        backward.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 int action = MotionEventCompat.getActionMasked(event);
@@ -77,46 +77,57 @@ public class Joystick_Activity extends AppCompatActivity implements JoystickTask
         });
 
         //Direction Listener
-       direction.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        direction.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 
-           @Override
-           public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-               int aux;
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                int aux;
                 if (progress > 255) {
                     aux = 3000 + progress - 255;
                     joystick_task.sendData(Integer.toString(aux));
+                } else if (progress < 255) {
+                    aux = 4255 + progress;
+                    joystick_task.sendData(Integer.toString(aux));
                 } else
-                     if (progress < 255) {
-                        aux = 4000 + progress;
-                        joystick_task.sendData(Integer.toString(aux));
-                    }
-                     else
-                        joystick_task.sendData("3000");
-           }
+                    joystick_task.sendData("3000");
+            }
 
 
-           @Override
-           public void onStartTrackingTouch(SeekBar seekBar) {
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
 
-           }
+            }
 
-           @Override
-           public void onStopTrackingTouch(SeekBar seekBar) {
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
 
-           }
-       });
+                joystick_task.sendData("3000");
+            }
+        });
     }
 
     @Override
-    public void onControllerConnected () {
+    public void onStop() {
+        super.onStop();
+        joystick_task.cancel(true);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        joystick_task.execute();
+    }
+
+    @Override
+    public void onControllerConnected() {
         isConnected = true;
     }
 
 
     @Override
-    public void onCameraImageIncoming (Bitmap bitmap){
+    public void onCameraImageIncoming(Bitmap bitmap) {
         cameraImage.setImageBitmap(bitmap);
     }
 
 
-            }
+}
