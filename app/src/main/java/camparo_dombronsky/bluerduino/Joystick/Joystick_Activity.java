@@ -109,6 +109,9 @@ public class Joystick_Activity extends AppCompatActivity implements JoystickTask
     @Override
     public void onStop() {
         super.onStop();
+        //Para avisar que se desconecto
+        joystick_task.sendData("9999");
+
         joystick_task.cancel(true);
     }
 
