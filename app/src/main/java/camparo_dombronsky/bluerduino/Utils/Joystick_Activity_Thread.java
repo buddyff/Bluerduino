@@ -57,12 +57,10 @@ public class Joystick_Activity_Thread extends AsyncTask<Void, Void, Void> {
                                 Bitmap bitmap = BitmapFactory.decodeByteArray(buffer, 0, buffer.length);
                                 listener.onCameraImageIncoming(bitmap);
                             }
-
                         }
                     }
                 });
             }
-
         }
         catch (UnknownHostException e) {
             e.printStackTrace();
@@ -91,8 +89,5 @@ public class Joystick_Activity_Thread extends AsyncTask<Void, Void, Void> {
             e.printStackTrace();
         }
     }
-
-
-
 
 }

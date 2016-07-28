@@ -136,15 +136,15 @@ public class Car_Activity extends AppCompatActivity {
                         statusBtn.setBackground(ContextCompat.getDrawable(getBaseContext(), R.drawable.check));
                         statusBtn.setOnTouchListener(null);
 
-                        if (car_thread == null) {
-                            car_thread = new Car_Activity_Thread(btSocket);
+                       /* if (car_thread == null) {
+                            car_thread = Car_Activity_Thread.getInstance(btSocket);
                             car_thread.execute();
                             frameLayout = (SurfaceView) findViewById(R.id.camera_preview);
                             // Create our Preview view and set it as the content of our activity.
                             frameLayout.getHolder().setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
                             frameLayout.getHolder().addCallback(car_thread);
                         } else
-                            car_thread.setBluetoothSocket(btSocket);
+                            car_thread.setBluetoothSocket(btSocket);*/
                     }
                     catch (IOException e){
                         Toast.makeText(getBaseContext(), "No se pudo establecer conexión BT", Toast.LENGTH_SHORT).show();
@@ -154,13 +154,17 @@ public class Car_Activity extends AppCompatActivity {
                 }
             }
 
-           /* if(car_thread == null) {
-                System.out.println("Creo el thread con socket null GUACHOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
-                car_thread = new Car_Activity_Thread(btSocket);
+            if(car_thread == null) {
+                System.out.println("Creo el thread GUACHOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
+                car_thread = Car_Activity_Thread.getInstance(btSocket);
+                frameLayout = (SurfaceView) findViewById(R.id.camera_preview);
+                            // Create our Preview view and set it as the content of our activity.
+                            frameLayout.getHolder().setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+                            frameLayout.getHolder().addCallback(car_thread);
                 car_thread.execute();
             }
-           /* else
-                car_thread.setBluetoothSocket(btSocket);*/
+            else
+                car_thread.setBluetoothSocket(btSocket);
 
         } catch (Exception e) {
             Toast.makeText(getBaseContext(), "Exception :(", Toast.LENGTH_SHORT).show();
@@ -305,7 +309,7 @@ public class Car_Activity extends AppCompatActivity {
                 }
 
                 if (car_thread == null) {
-                    car_thread = new Car_Activity_Thread(btSocket);
+                    car_thread = Car_Activity_Thread.getInstance(btSocket);
                     car_thread.execute();
                 } /*else
                     car_thread.setBluetoothSocket(btSocket);*/

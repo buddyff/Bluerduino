@@ -38,8 +38,17 @@ public class Car_Activity_Thread extends AsyncTask<Void, Void, Void> implements 
 
     private boolean isConnected;
 
+    private static Car_Activity_Thread instance = null;
 
-    public Car_Activity_Thread(BluetoothSocket socket) {
+    public static Car_Activity_Thread getInstance(BluetoothSocket socket) {
+        if(instance == null) {
+            instance = new Car_Activity_Thread(socket);
+        }
+        return instance;
+    }
+
+
+    protected Car_Activity_Thread(BluetoothSocket socket) {
         mmSocket = socket;
         isConnected = false;
         try {
