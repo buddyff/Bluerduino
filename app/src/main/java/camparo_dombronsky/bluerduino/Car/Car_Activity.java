@@ -34,7 +34,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class Car_Activity extends AppCompatActivity implements SurfaceHolder.Callback,Camera.PreviewCallback{
+public class Car_Activity extends AppCompatActivity {
 
     private TextView  infoip;
 
@@ -50,10 +50,6 @@ public class Car_Activity extends AppCompatActivity implements SurfaceHolder.Cal
     private boolean isTurnedOn = true;
     private ImageButton prendeApaga;
 
-    private Camera mCamera;
-    int w, h;
-    int[] rgbs;
-    boolean initialed = false;
 
     private static final String ARDUINO_MAC = "98:D3:35:00:98:52";
     private static final UUID ARDUINO_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
@@ -78,10 +74,7 @@ public class Car_Activity extends AppCompatActivity implements SurfaceHolder.Cal
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     System.out.println("ON CREATEEEEEEEEEEEEEEEEEEEEEEEE");
-        frameLayout = (SurfaceView) findViewById(R.id.camera_preview);
-        // Create our Preview view and set it as the content of our activity.
-        frameLayout.getHolder().setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-        frameLayout.getHolder().addCallback(this);
+
 
         prendeApaga = (ImageButton) findViewById(R.id.btn_prende_apaga);
         prendeApaga.setOnClickListener(new View.OnClickListener() {
@@ -146,6 +139,10 @@ public class Car_Activity extends AppCompatActivity implements SurfaceHolder.Cal
                         if (car_thread == null) {
                             car_thread = new Car_Activity_Thread(btSocket);
                             car_thread.execute();
+                            frameLayout = (SurfaceView) findViewById(R.id.camera_preview);
+                            // Create our Preview view and set it as the content of our activity.
+                            frameLayout.getHolder().setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+                            frameLayout.getHolder().addCallback(car_thread);
                         } else
                             car_thread.setBluetoothSocket(btSocket);
                     }
@@ -250,26 +247,7 @@ public class Car_Activity extends AppCompatActivity implements SurfaceHolder.Cal
         return ip;
     }
 
-    @Override
-    public void surfaceCreated(SurfaceHolder holder) {
-        createCameraInstance(holder);
-    }
 
-    @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
-        //Release the Camera resource
-        if (mCamera != null) {
-            mCamera.stopPreview();
-            mCamera.setPreviewCallback(null);
-            mCamera.release();
-            mCamera = null;
-        }
-    }
-
-    @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
-
-    }
 
     private void prendeApagaListener(){
         if(isTurnedOn){
@@ -282,77 +260,7 @@ public class Car_Activity extends AppCompatActivity implements SurfaceHolder.Cal
         }
     }
 
-    private void createCameraInstance(SurfaceHolder holder) {
-        try {
-            if (mCamera == null) {
-                mCamera = Camera.open(0);
-                mCamera.setPreviewCallback(this);
-                mCamera.setPreviewDisplay(holder);
-                mCamera.startPreview();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
-    @Override
-    public void onPreviewFrame(byte[] data, Camera camera) {
-        System.out.println("estoy mostrando cosaas");
-        if (!initialed) {
-            w = mCamera.getParameters().getPreviewSize().width;
-            h = mCamera.getParameters().getPreviewSize().height;
-            rgbs = new int[w * h];
-            initialed = true;
-        }
-
-        if (data != null) {
-            try {
-                decodeYUV420(rgbs, data, w, h);
-                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                System.out.println("Flag 1");
-
-                if (car_thread !=  null && car_thread.isConnected()) {
-                    //Todo : en vez de 50 hay que poner un selector de calidad de imagen como el de ioio
-                    Bitmap.createBitmap(rgbs, w, h, Bitmap.Config.ARGB_8888).compress(Bitmap.CompressFormat.JPEG, 50, bos);
-                    System.out.println("Flag 2");
-                    car_thread.sendImageData(bos.toByteArray());
-                }
-                //listener.onPreviewTaken(Bitmap.createBitmap(rgbs, w, h, Bitmap.Config.ARGB_8888));
-            } catch (OutOfMemoryError e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private void decodeYUV420(int[] rgb, byte[] yuv420, int width, int height) {
-        final int frameSize = width * height;
-
-        for (int j = 0, yp = 0; j < height; j++) {
-            int uvp = frameSize + (j >> 1) * width, u = 0, v = 0;
-            for (int i = 0; i < width; i++, yp++) {
-                int y = (0xff & ((int) yuv420[yp])) - 16;
-                if (y < 0) y = 0;
-                if ((i & 1) == 0) {
-                    v = (0xff & yuv420[uvp++]) - 128;
-                    u = (0xff & yuv420[uvp++]) - 128;
-                }
-
-                int y1192 = 1192 * y;
-                int r = (y1192 + 1634 * v);
-                int g = (y1192 - 833 * v - 400 * u);
-                int b = (y1192 + 2066 * u);
-
-                if (r < 0) r = 0;
-                else if (r > 262143) r = 262143;
-                if (g < 0) g = 0;
-                else if (g > 262143) g = 262143;
-                if (b < 0) b = 0;
-                else if (b > 262143) b = 262143;
-
-                rgb[yp] = 0xff000000 | ((r << 6) & 0xff0000) | ((g >> 2) & 0xff00) | ((b >> 10) & 0xff);
-            }
-        }
-    }
 
     private void retryConnection(){
         try {
