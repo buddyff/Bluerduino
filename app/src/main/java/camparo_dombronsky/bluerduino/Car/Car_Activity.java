@@ -2,11 +2,9 @@ package camparo_dombronsky.bluerduino.Car;
 
 import camparo_dombronsky.bluerduino.R;
 import camparo_dombronsky.bluerduino.Utils.Car_Activity_Thread;
-import camparo_dombronsky.bluerduino.Utils.Listeners.CarTaskListener;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -79,7 +77,7 @@ public class Car_Activity extends AppCompatActivity implements SurfaceHolder.Cal
         });
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
+    System.out.println("ON CREATEEEEEEEEEEEEEEEEEEEEEEEE");
         frameLayout = (SurfaceView) findViewById(R.id.camera_preview);
         // Create our Preview view and set it as the content of our activity.
         frameLayout.getHolder().setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
@@ -145,11 +143,11 @@ public class Car_Activity extends AppCompatActivity implements SurfaceHolder.Cal
                         statusBtn.setBackground(ContextCompat.getDrawable(getBaseContext(), R.drawable.check));
                         statusBtn.setOnTouchListener(null);
 
-                        /*if (car_thread == null) {
+                        if (car_thread == null) {
                             car_thread = new Car_Activity_Thread(btSocket);
                             car_thread.execute();
                         } else
-                            car_thread.setBluetoothSocket(btSocket);*/
+                            car_thread.setBluetoothSocket(btSocket);
                     }
                     catch (IOException e){
                         Toast.makeText(getBaseContext(), "No se pudo establecer conexión BT", Toast.LENGTH_SHORT).show();
@@ -159,8 +157,8 @@ public class Car_Activity extends AppCompatActivity implements SurfaceHolder.Cal
                 }
             }
 
-            if(car_thread == null) {
-                //System.out.println("Creo el thread con socket null GUACHOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
+           /* if(car_thread == null) {
+                System.out.println("Creo el thread con socket null GUACHOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
                 car_thread = new Car_Activity_Thread(btSocket);
                 car_thread.execute();
             }
@@ -177,9 +175,17 @@ public class Car_Activity extends AppCompatActivity implements SurfaceHolder.Cal
     @Override
     protected void onPause(){
         super.onPause();
-        System.out.println("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEsa");
+        System.out.println("PAUSEEEEEEE");
 
     }
+
+    @Override
+    protected void onStop(){
+        super.onStop();
+        System.out.println("STOPEOOOOO");
+
+    }
+
 
     @Override
     protected void onDestroy() {
@@ -303,11 +309,12 @@ public class Car_Activity extends AppCompatActivity implements SurfaceHolder.Cal
             try {
                 decodeYUV420(rgbs, data, w, h);
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                System.out.println("Flag 1");
 
-                if (car_thread!= null && car_thread.isConnected()) {
+                if (car_thread !=  null && car_thread.isConnected()) {
                     //Todo : en vez de 50 hay que poner un selector de calidad de imagen como el de ioio
                     Bitmap.createBitmap(rgbs, w, h, Bitmap.Config.ARGB_8888).compress(Bitmap.CompressFormat.JPEG, 50, bos);
-
+                    System.out.println("Flag 2");
                     car_thread.sendImageData(bos.toByteArray());
                 }
                 //listener.onPreviewTaken(Bitmap.createBitmap(rgbs, w, h, Bitmap.Config.ARGB_8888));

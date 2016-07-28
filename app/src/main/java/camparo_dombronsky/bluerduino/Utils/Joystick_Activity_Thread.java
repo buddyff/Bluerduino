@@ -26,23 +26,26 @@ public class Joystick_Activity_Thread extends AsyncTask<Void, Void, Void> {
     private DataInputStream dataInputStream;
     private JoystickTaskListener listener;
     private Activity joystick_activity;
+    private boolean andando;
 
     public Joystick_Activity_Thread(String addr, int port, JoystickTaskListener list) {
         ip = addr;
         this.port = port;
         listener = list;
         joystick_activity = (Activity) list;
+
     }
 
     @Override
     protected Void doInBackground(Void... arg0) {
         try {
+            andando = true;
             System.out.println("EMPEZO EL HILO MAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAN");
             socket = new Socket(ip, port);
             dataOutputStream = new DataOutputStream(socket.getOutputStream());
             dataInputStream = new DataInputStream(socket.getInputStream());
             listener.onControllerConnected();
-            while(true) {
+            while(andando) {
                 int size = dataInputStream.readInt();
                 final byte[] buffer = new byte[size];
                 dataInputStream.readFully(buffer);
@@ -75,6 +78,10 @@ public class Joystick_Activity_Thread extends AsyncTask<Void, Void, Void> {
         System.out.println(response);
         super.onPostExecute(result);
     }*/
+
+    public void frenar(){
+        andando = false;
+    }
 
     public void sendData (String data){
         try {

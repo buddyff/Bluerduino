@@ -111,8 +111,8 @@ public class Joystick_Activity extends AppCompatActivity implements JoystickTask
         super.onStop();
         //Para avisar que se desconecto
         joystick_task.sendData("9999");
-
-        joystick_task.cancel(true);
+        System.out.println("Se ejecuta el onStop");
+        joystick_task.frenar();
     }
 
     @Override
@@ -128,7 +128,7 @@ public class Joystick_Activity extends AppCompatActivity implements JoystickTask
 
 
     @Override
-    public void onCameraImageIncoming (Bitmap bitmap){
+    public void onCameraImageIncoming(Bitmap bitmap) {
         cameraImage.setImageBitmap(bitmap);
     }
 

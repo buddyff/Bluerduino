@@ -4,16 +4,13 @@ package camparo_dombronsky.bluerduino.Main_Menu;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Typeface;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
 import camparo_dombronsky.bluerduino.Car.Car_Activity;
-import camparo_dombronsky.bluerduino.Car.Car_Setup;
 import camparo_dombronsky.bluerduino.Joystick.Joystick_Setup;
 import camparo_dombronsky.bluerduino.R;
 
