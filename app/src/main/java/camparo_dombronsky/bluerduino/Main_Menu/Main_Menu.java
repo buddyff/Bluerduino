@@ -2,6 +2,7 @@ package camparo_dombronsky.bluerduino.Main_Menu;
 
 
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -48,5 +49,11 @@ public class Main_Menu extends Activity {
 
 
 
+    }
+
+    @Override
+    protected  void onDestroy(){
+        super.onDestroy();
+        BluetoothAdapter.getDefaultAdapter().disable();
     }
 }

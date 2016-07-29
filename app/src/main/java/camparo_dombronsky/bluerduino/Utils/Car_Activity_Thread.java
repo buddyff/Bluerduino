@@ -33,7 +33,7 @@ public class Car_Activity_Thread extends AsyncTask<Void, Void, Void> implements 
     private Camera mCamera;
     private int w, h;
     private int[] rgbs;
-    boolean initialed = false;
+    private boolean initialed = false;
 
 
     private boolean isConnected;
@@ -41,12 +41,15 @@ public class Car_Activity_Thread extends AsyncTask<Void, Void, Void> implements 
     private static Car_Activity_Thread instance = null;
 
     public static Car_Activity_Thread getInstance(BluetoothSocket socket) {
-        if(instance == null) {
+        if (instance == null) {
             instance = new Car_Activity_Thread(socket);
         }
         return instance;
     }
 
+    public boolean Instanced() {
+        return instance != null;
+    }
 
     protected Car_Activity_Thread(BluetoothSocket socket) {
         mmSocket = socket;
@@ -71,6 +74,16 @@ public class Car_Activity_Thread extends AsyncTask<Void, Void, Void> implements 
 
 
     @Override
+    protected void onCancelled() {
+        super.onCancelled();
+        try {
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
     public Void doInBackground(Void... arg0) {
         try {
 
@@ -93,6 +106,7 @@ public class Car_Activity_Thread extends AsyncTask<Void, Void, Void> implements 
 
                 //If no message sent from client, this code will block the program
                 messageFromClient = dataInputStream.readUTF();
+                System.out.println("Me llego instruccion..");
                 if (messageFromClient.equals("9999")) {
                     System.out.println("ME LLEGO LKA DE CE RRAR EL SOCKET");
                     socket = null;
@@ -100,6 +114,7 @@ public class Car_Activity_Thread extends AsyncTask<Void, Void, Void> implements 
                 } else {
                     byte[] msgBuffer = messageFromClient.getBytes();
                     if (mmOutStream != null) {
+                        System.out.println("La mando al Arduino");
                         mmOutStream.write(msgBuffer);
                         mmOutStream.flush();
                     }
@@ -109,6 +124,8 @@ public class Car_Activity_Thread extends AsyncTask<Void, Void, Void> implements 
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        System.out.println("Termina DoInBackground");
         return null;
     }
 

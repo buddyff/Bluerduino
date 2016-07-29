@@ -32,7 +32,8 @@
 
         <activity
             android:name=".Car.Car_Activity"
-            android:screenOrientation="landscape">
+            android:screenOrientation="landscape"
+            android:configChanges="orientation|screenSize">
         </activity>
 
         <activity
