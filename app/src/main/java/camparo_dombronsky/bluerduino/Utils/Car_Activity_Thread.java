@@ -60,9 +60,9 @@ public class Car_Activity_Thread extends AsyncTask<Void, Void, Void> implements 
 
     private boolean isConnected;
 
-    private static Car_Activity_Thread instance = null;
+   // private static Car_Activity_Thread instance = null;
 
-    public static Car_Activity_Thread getInstance(Car_Activity _carActivity) {
+    /*public static Car_Activity_Thread getInstance(Car_Activity _carActivity) {
         if (instance == null) {
             instance = new Car_Activity_Thread(_carActivity);
         }
@@ -71,23 +71,22 @@ public class Car_Activity_Thread extends AsyncTask<Void, Void, Void> implements 
 
     public boolean Instanced() {
         return instance != null;
-    }
+    }*/
 
-    protected Car_Activity_Thread(Car_Activity _carActivity) {
+    public Car_Activity_Thread(Car_Activity _carActivity) {
         carActivity = _carActivity;
     }
 
-    public void closeSockets(){
+    public void closeSockets() {
         try {
-            serverSocket.close();
-            socket.close();
+            if (btSocket != null) btSocket.close();
+            if (btOutStream != null) btOutStream.close();
+            if (serverSocket != null) serverSocket.close();
+            if (socket != null) socket.close();
             dataInputStream = null;
             dataOutputStream = null;
-            btSocket.close();
-            btOutStream.close();
-           // btInStream.close();
-        }
-        catch (Exception e){
+            // btInStream.close();
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

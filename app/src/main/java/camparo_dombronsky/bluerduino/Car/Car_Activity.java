@@ -86,7 +86,7 @@ public class Car_Activity extends AppCompatActivity {
         super.onResume();
         try {
             System.out.println("Creo el thread GUACHOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
-            car_thread = Car_Activity_Thread.getInstance(this);
+            car_thread = new Car_Activity_Thread(this);
 
             frameLayout = (SurfaceView) findViewById(R.id.camera_preview);
             // Create our Preview view and set it as the content of our activity.
