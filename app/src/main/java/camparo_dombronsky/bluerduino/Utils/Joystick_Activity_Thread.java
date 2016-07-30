@@ -9,11 +9,13 @@ import java.net.UnknownHostException;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.widget.Toast;
 
+import camparo_dombronsky.bluerduino.Joystick.Joystick_Setup;
 import camparo_dombronsky.bluerduino.Utils.Listeners.JoystickTaskListener;
 
 
@@ -47,6 +49,18 @@ public class Joystick_Activity_Thread extends AsyncTask<Void, Void, Void> {
             listener.onControllerConnected();
             while(andando) {
                 int size = dataInputStream.readInt();
+                if(size < 0){
+                    socket.close();
+                    joystick_activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Intent intent = new Intent(joystick_activity, Joystick_Setup.class);
+                            joystick_activity.startActivity(intent);
+                            Toast.makeText(joystick_activity.getApplicationContext(), "Se perdio la conexion con Camera", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    break;
+                }
                 final byte[] buffer = new byte[size];
                 dataInputStream.readFully(buffer);
                 joystick_activity.runOnUiThread(new Runnable() {

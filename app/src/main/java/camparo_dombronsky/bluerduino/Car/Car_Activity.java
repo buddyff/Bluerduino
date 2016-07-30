@@ -36,22 +36,13 @@ import android.widget.Toast;
 public class Car_Activity extends AppCompatActivity {
 
     private TextView infoip;
-
-
     private Car_Activity_Thread car_thread;
-    private BluetoothAdapter btAdapter;
     private SurfaceView frameLayout;
-    private ImageButton statusBtn;
 
-    //ATRIBUTOS DE CONNECTION2ARDUINO
-    private BluetoothSocket btSocket;
-    private BluetoothDevice device;
     private boolean isTurnedOn = true;
     private ImageButton prendeApaga;
 
-
-    private static final String ARDUINO_MAC = "98:D3:35:00:98:52";
-    private static final UUID ARDUINO_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+    private ImageButton statusBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,16 +81,14 @@ public class Car_Activity extends AppCompatActivity {
                 }
             }
         });
-
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         try {
-            checkBTState();
             System.out.println("Creo el thread GUACHOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
-            car_thread = Car_Activity_Thread.getInstance(btSocket);
+            car_thread = Car_Activity_Thread.getInstance(this);
 
             frameLayout = (SurfaceView) findViewById(R.id.camera_preview);
             // Create our Preview view and set it as the content of our activity.
@@ -130,31 +119,9 @@ public class Car_Activity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         System.out.println("Destruyo el thread");
-        try {
-            btSocket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        car_thread.cancel(true);
-    }
 
-    //method to check if the device has Bluetooth and if it is on.
-    //Prompts the user to turn it on if it is off
-    private boolean checkBTState() {
-        // Check if the device has Bluetooth and that it is turned on
-        btAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (btAdapter == null) {
-            Toast.makeText(getBaseContext(), "El dispositivo no tiene Bluetooth", Toast.LENGTH_SHORT).show();
-            finish();
-        } else {
-            if (!btAdapter.isEnabled()) {
-                //Prompt user to turn on Bluetooth
-                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                startActivityForResult(enableBtIntent, 1);
-            }
-            else conectarBluetooth();
-        }
-        return true;
+        car_thread.killJoystick();
+        car_thread.cancel(true);
     }
 
     @Override
@@ -162,7 +129,7 @@ public class Car_Activity extends AppCompatActivity {
         switch (requestCode) {
             case 1: {
                 if (resultCode == RESULT_OK) {
-                    conectarBluetooth();
+                    car_thread.connectBluetooth();
 
                 } else {
                     // Acciones adicionales a realizar si el usuario no activa el Bluetooth
@@ -172,57 +139,8 @@ public class Car_Activity extends AppCompatActivity {
             default:
                 break;
         }
-
     }
 
-    private void conectarBluetooth() {
-        // Get a set of currently paired devices
-        Set<BluetoothDevice> pairedDevices = btAdapter.getBondedDevices();
-        // Look for the Arduino Bluetooth Device
-        if (pairedDevices.size() > 0) {
-            for (BluetoothDevice paired_device : pairedDevices) {
-                if (paired_device.getAddress().equals(ARDUINO_MAC)) {
-                    device = paired_device;
-                    break;
-                }
-            }
-        }
-
-        if (device != null) {
-            //Create an RFCOMM BluetoothSocket ready to start a secure outgoing connection to this remote device
-            try {
-                btSocket = device.createRfcommSocketToServiceRecord(ARDUINO_UUID);
-            } catch (Exception e) {
-            }
-            System.out.println("Creo el socket bluetooth");
-        } else {
-            Toast.makeText(getBaseContext(), "El dispositivo Bluetooth del Arduino no se encuentra emparejado", Toast.LENGTH_SHORT).show();
-        }
-
-        //System.out.println("Socket conectado : " + btSocket.toString());
-        if (btSocket != null && !btSocket.isConnected()) {
-            try {
-                System.out.println("Voy a conectar el bluetooth");
-                btAdapter.cancelDiscovery();
-                btSocket.connect();
-                System.out.println("Conecto el bluetooth");
-                //outStream = btSocket.getOutputStream();
-                Toast.makeText(getBaseContext(), "Conexion con Arduino establecida correctamente", Toast.LENGTH_SHORT).show();
-
-                statusBtn.setBackground(ContextCompat.getDrawable(getBaseContext(), R.drawable.check));
-                statusBtn.setOnTouchListener(null);
-
-                if (car_thread == null)
-                    car_thread = Car_Activity_Thread.getInstance(btSocket);
-                else car_thread.setBluetoothSocket(btSocket);
-
-            } catch (IOException e) {
-                Toast.makeText(getBaseContext(), "No se pudo establecer conexión BT", Toast.LENGTH_SHORT).show();
-                statusBtn.setBackground(ContextCompat.getDrawable(getBaseContext(), R.drawable.retry));
-                e.printStackTrace();
-            }
-        }
-    }
 
     private String getIpAddress() {
         String ip = "";
@@ -264,10 +182,27 @@ public class Car_Activity extends AppCompatActivity {
 
     private void retryConnection() {
         try {
-            checkBTState();
+            car_thread.checkBTState();
         } catch (Exception e) {
 
         }
+    }
+
+    public void statusButtonStyle(boolean connected){
+        if(connected){
+            Toast.makeText(getBaseContext(), "Conexion con Arduino establecida correctamente", Toast.LENGTH_SHORT).show();
+
+            statusBtn.setBackground(ContextCompat.getDrawable(getBaseContext(), R.drawable.check));
+            statusBtn.setOnTouchListener(null);
+        }
+        else{
+            Toast.makeText(getBaseContext(), "No se pudo establecer conexión BT", Toast.LENGTH_SHORT).show();
+            statusBtn.setBackground(ContextCompat.getDrawable(getBaseContext(), R.drawable.retry));
+        }
+    }
+
+    public void jaja(){
+
     }
 
 }

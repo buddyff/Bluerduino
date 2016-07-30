@@ -1,10 +1,17 @@
 package camparo_dombronsky.bluerduino.Utils;
 
+import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.hardware.Camera;
 import android.os.AsyncTask;
+import android.support.v4.content.ContextCompat;
 import android.view.SurfaceHolder;
+import android.widget.ImageButton;
+import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -14,20 +21,34 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Set;
+import java.util.UUID;
+
+import camparo_dombronsky.bluerduino.Car.Car_Activity;
+import camparo_dombronsky.bluerduino.Joystick.Joystick_Setup;
+import camparo_dombronsky.bluerduino.R;
 
 public class Car_Activity_Thread extends AsyncTask<Void, Void, Void> implements SurfaceHolder.Callback, Camera.PreviewCallback {
 
     private static final int SocketServerPORT = 7000;
     private ServerSocket serverSocket;
 
-    private BluetoothSocket mmSocket;
-    private InputStream mmInStream;
-    private OutputStream mmOutStream;
+    private BluetoothSocket btSocket;
+    private InputStream btInStream;
+    private OutputStream btOutStream;
 
     private DataInputStream dataInputStream = null;
     private DataOutputStream dataOutputStream;
     private OutputStream out;
     private Socket socket;
+
+    //ATRIBUTOS DE CONNECTION2ARDUINO
+    private BluetoothAdapter btAdapter;
+    private BluetoothDevice device;
+
+
+    private static final String ARDUINO_MAC = "98:D3:35:00:98:52";
+    private static final UUID ARDUINO_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
 
     private Camera mCamera;
@@ -35,14 +56,15 @@ public class Car_Activity_Thread extends AsyncTask<Void, Void, Void> implements 
     private int[] rgbs;
     private boolean initialed = false;
 
+    private Car_Activity carActivity;
 
     private boolean isConnected;
 
     private static Car_Activity_Thread instance = null;
 
-    public static Car_Activity_Thread getInstance(BluetoothSocket socket) {
+    public static Car_Activity_Thread getInstance(Car_Activity _carActivity) {
         if (instance == null) {
-            instance = new Car_Activity_Thread(socket);
+            instance = new Car_Activity_Thread(_carActivity);
         }
         return instance;
     }
@@ -51,33 +73,17 @@ public class Car_Activity_Thread extends AsyncTask<Void, Void, Void> implements 
         return instance != null;
     }
 
-    protected Car_Activity_Thread(BluetoothSocket socket) {
-        mmSocket = socket;
-        isConnected = false;
-        try {
-            if (mmSocket.isConnected()) {
-                mmInStream = socket.getInputStream();
-                mmOutStream = socket.getOutputStream();
-            }
-        } catch (Exception e) {
-        }
+    protected Car_Activity_Thread(Car_Activity _carActivity) {
+       carActivity = _carActivity;
     }
 
-    public void setBluetoothSocket(BluetoothSocket soc) {
-        mmSocket = soc;
-        try {
-            mmInStream = mmSocket.getInputStream();
-            mmOutStream = mmSocket.getOutputStream();
-        } catch (IOException e) {
-        }
-    }
-
-
-    @Override
+      @Override
     protected void onCancelled() {
         super.onCancelled();
         try {
+            serverSocket.close();
             socket.close();
+            btSocket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -86,9 +92,9 @@ public class Car_Activity_Thread extends AsyncTask<Void, Void, Void> implements 
     @Override
     public Void doInBackground(Void... arg0) {
         String messageFromClient;
+        checkBTState();
         try {
             serverSocket = new ServerSocket(SocketServerPORT);
-            serverSocket.setSoTimeout(500);
             socket = null;
         } catch (IOException e) {
             e.printStackTrace();
@@ -99,7 +105,6 @@ public class Car_Activity_Thread extends AsyncTask<Void, Void, Void> implements 
                 if (socket == null) {
 
                     socket = serverSocket.accept();
-                    socket.setSoTimeout(500);
                     dataInputStream = new DataInputStream(socket.getInputStream());
                     dataOutputStream = new DataOutputStream(socket.getOutputStream());
                     out = socket.getOutputStream();
@@ -116,17 +121,15 @@ public class Car_Activity_Thread extends AsyncTask<Void, Void, Void> implements 
                     isConnected = false;
                 } else {
                     byte[] msgBuffer = messageFromClient.getBytes();
-                    if (mmOutStream != null) {
+                    if (btOutStream != null) {
                         System.out.println("La mando al Arduino");
-                        mmOutStream.write(msgBuffer);
-                        mmOutStream.flush();
+                        btOutStream.write(msgBuffer);
+                        btOutStream.flush();
                     }
                 }
             } catch (Exception e) {
             }
-
         }
-
 
         System.out.println("Termina DoInBackground");
         return null;
@@ -150,6 +153,13 @@ public class Car_Activity_Thread extends AsyncTask<Void, Void, Void> implements 
         }
     }
 
+    public void killJoystick(){
+        try {
+            dataOutputStream.writeInt(-1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     public boolean isConnected() {
         return isConnected;
     }
@@ -249,6 +259,66 @@ public class Car_Activity_Thread extends AsyncTask<Void, Void, Void> implements 
         }
     }
 
+    public void connectBluetooth() {
+        // Get a set of currently paired devices
+        Set<BluetoothDevice> pairedDevices = btAdapter.getBondedDevices();
+        // Look for the Arduino Bluetooth Device
+        if (pairedDevices.size() > 0) {
+            for (BluetoothDevice paired_device : pairedDevices) {
+                if (paired_device.getAddress().equals(ARDUINO_MAC)) {
+                    device = paired_device;
+                    break;
+                }
+            }
+        }
+
+        if (device != null) {
+            //Create an RFCOMM BluetoothSocket ready to start a secure outgoing connection to this remote device
+            try {
+                btSocket = device.createRfcommSocketToServiceRecord(ARDUINO_UUID);
+            } catch (Exception e) {
+            }
+            System.out.println("Creo el socket bluetooth");
+        } else {
+            Toast.makeText(carActivity.getBaseContext(), "El dispositivo Bluetooth del Arduino no se encuentra emparejado", Toast.LENGTH_SHORT).show();
+        }
+
+        //System.out.println("Socket conectado : " + btSocket.toString());
+        if (btSocket != null && !btSocket.isConnected()) {
+            try {
+                System.out.println("Voy a conectar el bluetooth");
+                btAdapter.cancelDiscovery();
+                btSocket.connect();
+                btInStream = btSocket.getInputStream();
+                btOutStream = btSocket.getOutputStream();
+                System.out.println("Conecto el bluetooth");
+                //outStream = btSocket.getOutputStream();
+
+                carActivity.statusButtonStyle(true);
+
+            } catch (IOException e) {
+                carActivity.statusButtonStyle(false);
+                e.printStackTrace();
+            }
+        }
+    }
+    //method to check if the device has Bluetooth and if it is on.
+    //Prompts the user to turn it on if it is off
+    public boolean checkBTState() {
+        // Check if the device has Bluetooth and that it is turned on
+        btAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (btAdapter == null) {
+            Toast.makeText(carActivity.getBaseContext(), "El dispositivo no tiene Bluetooth", Toast.LENGTH_SHORT).show();
+            carActivity.finish();
+        } else {
+            if (!btAdapter.isEnabled()) {
+                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                carActivity.startActivityForResult(enableBtIntent, 1);
+            }
+            else connectBluetooth();
+        }
+        return true;
+    }
 }
 
 
