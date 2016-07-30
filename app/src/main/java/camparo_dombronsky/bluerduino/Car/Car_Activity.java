@@ -119,6 +119,7 @@ public class Car_Activity extends AppCompatActivity {
         System.out.println("Destruyo el thread");
 
         car_thread.killJoystick();
+        car_thread.closeSockets();
         car_thread.cancel(true);
     }
 

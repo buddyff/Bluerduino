@@ -34,7 +34,7 @@ public class Car_Activity_Thread extends AsyncTask<Void, Void, Void> implements 
     private ServerSocket serverSocket;
 
     private BluetoothSocket btSocket;
-    private InputStream btInStream;
+    //private InputStream btInStream;
     private OutputStream btOutStream;
 
     private DataInputStream dataInputStream = null;
@@ -74,17 +74,20 @@ public class Car_Activity_Thread extends AsyncTask<Void, Void, Void> implements 
     }
 
     protected Car_Activity_Thread(Car_Activity _carActivity) {
-       carActivity = _carActivity;
+        carActivity = _carActivity;
     }
 
-      @Override
-    protected void onCancelled() {
-        super.onCancelled();
+    public void closeSockets(){
         try {
             serverSocket.close();
             socket.close();
+            dataInputStream = null;
+            dataOutputStream = null;
             btSocket.close();
-        } catch (IOException e) {
+            btOutStream.close();
+           // btInStream.close();
+        }
+        catch (Exception e){
             e.printStackTrace();
         }
     }
@@ -92,7 +95,14 @@ public class Car_Activity_Thread extends AsyncTask<Void, Void, Void> implements 
     @Override
     public Void doInBackground(Void... arg0) {
         String messageFromClient;
-        checkBTState();
+        new Thread() {
+            @Override
+            public void run() {
+                checkBTState();
+            }
+        }.start();
+
+
         try {
             serverSocket = new ServerSocket(SocketServerPORT);
             socket = null;
@@ -153,13 +163,14 @@ public class Car_Activity_Thread extends AsyncTask<Void, Void, Void> implements 
         }
     }
 
-    public void killJoystick(){
+    public void killJoystick() {
         try {
             dataOutputStream.writeInt(-1);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
     public boolean isConnected() {
         return isConnected;
     }
@@ -289,19 +300,30 @@ public class Car_Activity_Thread extends AsyncTask<Void, Void, Void> implements 
                 System.out.println("Voy a conectar el bluetooth");
                 btAdapter.cancelDiscovery();
                 btSocket.connect();
-                btInStream = btSocket.getInputStream();
+                //btInStream = btSocket.getInputStream();
                 btOutStream = btSocket.getOutputStream();
                 System.out.println("Conecto el bluetooth");
                 //outStream = btSocket.getOutputStream();
 
-                carActivity.statusButtonStyle(true);
+                carActivity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        carActivity.statusButtonStyle(true);
+                    }
+                });
 
             } catch (IOException e) {
-                carActivity.statusButtonStyle(false);
+                carActivity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        carActivity.statusButtonStyle(false);
+                    }
+                });
                 e.printStackTrace();
             }
         }
     }
+
     //method to check if the device has Bluetooth and if it is on.
     //Prompts the user to turn it on if it is off
     public boolean checkBTState() {
@@ -314,8 +336,7 @@ public class Car_Activity_Thread extends AsyncTask<Void, Void, Void> implements 
             if (!btAdapter.isEnabled()) {
                 Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 carActivity.startActivityForResult(enableBtIntent, 1);
-            }
-            else connectBluetooth();
+            } else connectBluetooth();
         }
         return true;
     }

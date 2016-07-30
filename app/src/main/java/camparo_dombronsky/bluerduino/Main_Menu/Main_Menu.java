@@ -27,14 +27,19 @@ public class Main_Menu extends Activity {
         setContentView(R.layout.main_menu);
 
         title = (TextView) findViewById(R.id.menu_title);
-        Typeface type = Typeface.createFromAsset(getAssets(),"fonts/smart watch.ttf");
+        Typeface type = Typeface.createFromAsset(getAssets(), "fonts/smart watch.ttf");
         title.setTypeface(type);
 
         btn_car = (ImageButton) findViewById(R.id.btn_car);
         btn_car.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                Intent intent = new Intent(Main_Menu.this, Car_Activity.class);
-                startActivity(intent);
+                if (!BluetoothAdapter.getDefaultAdapter().isEnabled()) {
+                    Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                    startActivityForResult(enableBtIntent, 1);
+                } else {
+                    Intent intent = new Intent(Main_Menu.this, Car_Activity.class);
+                    startActivity(intent);
+                }
             }
         });
 
@@ -45,14 +50,28 @@ public class Main_Menu extends Activity {
                 startActivity(intent);
             }
         });
-
-
-
-
     }
 
     @Override
-    protected  void onDestroy(){
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case 1: {
+                if (resultCode == RESULT_OK) {
+
+                    Intent intent = new Intent(Main_Menu.this, Car_Activity.class);
+                    startActivity(intent);
+                } else {
+                    // Acciones adicionales a realizar si el usuario no activa el Bluetooth
+                }
+                break;
+            }
+            default:
+                break;
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
         super.onDestroy();
         BluetoothAdapter.getDefaultAdapter().disable();
     }
