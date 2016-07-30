@@ -23,13 +23,15 @@
         android:id="@+id/btn_prende_apaga"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:background="@mipmap/ic_launcher"/>
+        android:background="@drawable/light_on"/>
         <TextView
             android:id="@+id/ip_address"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAlignment="center"
-            android:layout_weight="1"/>
+            android:layout_weight="1"
+            android:textColor="@color/colorAccent"
+            android:textSize="25sp"/>
 
         <ImageButton
         android:id="@+id/status_btn"
