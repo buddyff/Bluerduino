@@ -3,7 +3,6 @@ package camparo_dombronsky.bluerduino.Car;
 import camparo_dombronsky.bluerduino.R;
 import camparo_dombronsky.bluerduino.Utils.Car_Activity_Thread;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -18,8 +17,6 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.hardware.Camera;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 
@@ -81,11 +78,12 @@ public class Car_Activity extends AppCompatActivity {
                 if (isTurnedOn) {
                     getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                     isTurnedOn = false;
-                    //prendeApaga.setBackground();
+                    prendeApaga.setBackground(getResources().getDrawable(R.drawable.light_off));
                     Toast.makeText(getBaseContext(), "La pantalla se apagara pronto", Toast.LENGTH_SHORT).show();
                 } else {
                     getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                     isTurnedOn = true;
+                    prendeApaga.setBackground(getResources().getDrawable(R.drawable.light_on));
                     Toast.makeText(getBaseContext(), "La pantalla permanecera encendida", Toast.LENGTH_SHORT).show();
                 }
             }
