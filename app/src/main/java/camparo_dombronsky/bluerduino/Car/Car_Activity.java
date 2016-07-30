@@ -97,16 +97,16 @@ public class Car_Activity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         try {
-                checkBTState();
-                System.out.println("Creo el thread GUACHOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
-                car_thread = Car_Activity_Thread.getInstance(btSocket);
+            checkBTState();
+            System.out.println("Creo el thread GUACHOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
+            car_thread = Car_Activity_Thread.getInstance(btSocket);
 
-                frameLayout = (SurfaceView) findViewById(R.id.camera_preview);
-                // Create our Preview view and set it as the content of our activity.
-                frameLayout.getHolder().setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-                frameLayout.getHolder().addCallback(car_thread);
+            frameLayout = (SurfaceView) findViewById(R.id.camera_preview);
+            // Create our Preview view and set it as the content of our activity.
+            frameLayout.getHolder().setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+            frameLayout.getHolder().addCallback(car_thread);
 
-                car_thread.execute();
+            car_thread.execute();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -152,72 +152,75 @@ public class Car_Activity extends AppCompatActivity {
                 Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 startActivityForResult(enableBtIntent, 1);
             }
+            else conectarBluetooth();
         }
         return true;
     }
 
     @Override
-    protected void onActivityResult (int requestCode, int resultCode, Intent data) {
-        switch(requestCode)
-        {
-            case 1:
-            {
-                if(resultCode == RESULT_OK)
-                {
-                    // Get a set of currently paired devices
-                    Set<BluetoothDevice> pairedDevices = btAdapter.getBondedDevices();
-                    // Look for the Arduino Bluetooth Device
-                    if (pairedDevices.size() > 0) {
-                        for (BluetoothDevice paired_device : pairedDevices) {
-                            if (paired_device.getAddress().equals(ARDUINO_MAC)) {
-                                device = paired_device;
-                                break;
-                            }
-                        }
-                    }
-                    if (device != null) {
-                        //Create an RFCOMM BluetoothSocket ready to start a secure outgoing connection to this remote device
-                        try {
-                            btSocket = device.createRfcommSocketToServiceRecord(ARDUINO_UUID);
-                        }
-                        catch (Exception e){}
-                        System.out.println("Creo el socket bluetooth");
-                    } else {
-                        Toast.makeText(getBaseContext(), "El dispositivo Bluetooth del Arduino no se encuentra emparejado", Toast.LENGTH_SHORT).show();
-                    }
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case 1: {
+                if (resultCode == RESULT_OK) {
+                    conectarBluetooth();
 
-                    //System.out.println("Socket conectado : " + btSocket.toString());
-                    if (btSocket != null && !btSocket.isConnected()) {
-                        try {
-                            System.out.println("Voy a conectar el bluetooth");
-                            btAdapter.cancelDiscovery();
-                            btSocket.connect();
-                            System.out.println("Conecto el bluetooth");
-                            //outStream = btSocket.getOutputStream();
-                            Toast.makeText(getBaseContext(), "Conexion con Arduino establecida correctamente", Toast.LENGTH_SHORT).show();
-
-                            statusBtn.setBackground(ContextCompat.getDrawable(getBaseContext(), R.drawable.check));
-                            statusBtn.setOnTouchListener(null);
-
-                            if(car_thread == null) car_thread = Car_Activity_Thread.getInstance(btSocket);
-                            else car_thread.setBluetoothSocket(btSocket);
-
-                        } catch (IOException e) {
-                            Toast.makeText(getBaseContext(), "No se pudo establecer conexión BT", Toast.LENGTH_SHORT).show();
-                            statusBtn.setBackground(ContextCompat.getDrawable(getBaseContext(), R.drawable.retry));
-                            e.printStackTrace();
-                        }
-                    }
-                }
-                else
-                {
+                } else {
                     // Acciones adicionales a realizar si el usuario no activa el Bluetooth
                 }
                 break;
             }
-
             default:
                 break;
+        }
+
+    }
+
+    private void conectarBluetooth() {
+        // Get a set of currently paired devices
+        Set<BluetoothDevice> pairedDevices = btAdapter.getBondedDevices();
+        // Look for the Arduino Bluetooth Device
+        if (pairedDevices.size() > 0) {
+            for (BluetoothDevice paired_device : pairedDevices) {
+                if (paired_device.getAddress().equals(ARDUINO_MAC)) {
+                    device = paired_device;
+                    break;
+                }
+            }
+        }
+
+        if (device != null) {
+            //Create an RFCOMM BluetoothSocket ready to start a secure outgoing connection to this remote device
+            try {
+                btSocket = device.createRfcommSocketToServiceRecord(ARDUINO_UUID);
+            } catch (Exception e) {
+            }
+            System.out.println("Creo el socket bluetooth");
+        } else {
+            Toast.makeText(getBaseContext(), "El dispositivo Bluetooth del Arduino no se encuentra emparejado", Toast.LENGTH_SHORT).show();
+        }
+
+        //System.out.println("Socket conectado : " + btSocket.toString());
+        if (btSocket != null && !btSocket.isConnected()) {
+            try {
+                System.out.println("Voy a conectar el bluetooth");
+                btAdapter.cancelDiscovery();
+                btSocket.connect();
+                System.out.println("Conecto el bluetooth");
+                //outStream = btSocket.getOutputStream();
+                Toast.makeText(getBaseContext(), "Conexion con Arduino establecida correctamente", Toast.LENGTH_SHORT).show();
+
+                statusBtn.setBackground(ContextCompat.getDrawable(getBaseContext(), R.drawable.check));
+                statusBtn.setOnTouchListener(null);
+
+                if (car_thread == null)
+                    car_thread = Car_Activity_Thread.getInstance(btSocket);
+                else car_thread.setBluetoothSocket(btSocket);
+
+            } catch (IOException e) {
+                Toast.makeText(getBaseContext(), "No se pudo establecer conexión BT", Toast.LENGTH_SHORT).show();
+                statusBtn.setBackground(ContextCompat.getDrawable(getBaseContext(), R.drawable.retry));
+                e.printStackTrace();
+            }
         }
     }
 
@@ -237,17 +240,13 @@ public class Car_Activity extends AppCompatActivity {
                     if (inetAddress.isSiteLocalAddress()) {
                         ip += inetAddress.getHostAddress() + "\n";
                     }
-
                 }
-
             }
-
         } catch (SocketException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
             ip += "Something Wrong! " + e.toString() + "\n";
         }
-
         return ip;
     }
 
@@ -265,51 +264,9 @@ public class Car_Activity extends AppCompatActivity {
 
     private void retryConnection() {
         try {
-            //It is best to check BT status at onResume in case something has changed while app was paused etc
-            if (checkBTState()) {
-                // Get a set of currently paired devices
-                Set<BluetoothDevice> pairedDevices = btAdapter.getBondedDevices();
-                // Look for the Arduino Bluetooth Device
-                if (pairedDevices.size() > 0) {
-                    for (BluetoothDevice paired_device : pairedDevices) {
-                        if (paired_device.getAddress().equals(ARDUINO_MAC)) {
-                            device = paired_device;
-                            break;
-                        }
-                    }
-                }
-                if (device != null) {
-                    //Create an RFCOMM BluetoothSocket ready to start a secure outgoing connection to this remote device
-                    btSocket = device.createRfcommSocketToServiceRecord(ARDUINO_UUID);
-                    System.out.println("Creo el socket bluetooth");
-                } else {
-                    Toast.makeText(getBaseContext(), "El dispositivo Bluetooth del Arduino no se encuentra emparejado", Toast.LENGTH_SHORT).show();
-                }
+            checkBTState();
+        } catch (Exception e) {
 
-                System.out.println("Socket conectado : " + btSocket.toString());
-                if (btSocket != null && !btSocket.isConnected()) {
-                    try {
-                        System.out.println("Voy a conectar el bluetooth");
-                        btAdapter.cancelDiscovery();
-                        btSocket.connect();
-                        System.out.println("Conecto el bluetooth");
-                        //outStream = btSocket.getOutputStream();
-                        Toast.makeText(getBaseContext(), "Conexion con Arduino establecida correctamente", Toast.LENGTH_SHORT).show();
-
-                        statusBtn.setBackground(ContextCompat.getDrawable(getBaseContext(), R.drawable.check));
-                        statusBtn.setOnTouchListener(null);
-                    } catch (IOException e) {
-                        Toast.makeText(getBaseContext(), "No se pudo establecer conexión Bluetooth", Toast.LENGTH_SHORT).show();
-                        e.printStackTrace();
-                    }
-                }
-                car_thread.setBluetoothSocket(btSocket);
-            }
-
-        } catch (IOException e) {
-            Toast.makeText(getBaseContext(), "No se pudo establecer conexión BT", Toast.LENGTH_SHORT).show();
-            statusBtn.setBackground(ContextCompat.getDrawable(getBaseContext(), R.drawable.retry));
-            e.printStackTrace();
         }
     }
 

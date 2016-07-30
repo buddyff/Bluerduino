@@ -61,6 +61,7 @@ public class Joystick_Activity_Thread extends AsyncTask<Void, Void, Void> {
                     }
                 });
             }
+            System.out.println("Muere Joystick Activity Thread");
         }
         catch (UnknownHostException e) {
             e.printStackTrace();

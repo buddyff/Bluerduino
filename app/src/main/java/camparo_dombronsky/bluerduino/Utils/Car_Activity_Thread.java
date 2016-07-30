@@ -85,18 +85,21 @@ public class Car_Activity_Thread extends AsyncTask<Void, Void, Void> implements 
 
     @Override
     public Void doInBackground(Void... arg0) {
+        String messageFromClient;
         try {
-
             serverSocket = new ServerSocket(SocketServerPORT);
+            serverSocket.setSoTimeout(500);
             socket = null;
-            String messageFromClient;
-
-            while (true) {
-
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        while (!isCancelled()) {
+            try {
                 //This block will be executed just the first time to establish the connection
                 if (socket == null) {
 
                     socket = serverSocket.accept();
+                    socket.setSoTimeout(500);
                     dataInputStream = new DataInputStream(socket.getInputStream());
                     dataOutputStream = new DataOutputStream(socket.getOutputStream());
                     out = socket.getOutputStream();
@@ -119,11 +122,11 @@ public class Car_Activity_Thread extends AsyncTask<Void, Void, Void> implements 
                         mmOutStream.flush();
                     }
                 }
-
+            } catch (Exception e) {
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+
         }
+
 
         System.out.println("Termina DoInBackground");
         return null;
