@@ -1,6 +1,11 @@
 package camparo_dombronsky.bluerduino.Joystick;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -85,11 +90,35 @@ public class Joystick_Activity extends AppCompatActivity implements JoystickTask
                 if (progress > 255) {
                     aux = 3000 + progress - 255;
                     joystick_task.sendData(Integer.toString(aux));
+
+                    Matrix matrix = new Matrix();
+                    float degrees = 90.0f / 255.0f * (progress - 255);
+                    System.out.println("voy a rotar " +degrees+" grados");
+                    matrix.postRotate(degrees);
+                    Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.wheel);
+                    Bitmap b = Bitmap.createBitmap(icon, 0, 0, icon.getWidth(), icon.getHeight(), matrix, true);
+                    Drawable d = new BitmapDrawable(getResources(), b);
+                    direction.setThumb(d);
+                    System.out.println("Se roto la imagen");
                 } else if (progress < 255) {
                     aux = 4255 - progress;
                     joystick_task.sendData(Integer.toString(aux));
-                } else
+
+                    Matrix matrix = new Matrix();
+                    float degrees = 360.0f - (90.0f / 255.0f * (255.0f - progress));
+                    System.out.println("voy a rotar " +degrees+" grados");
+                    matrix.postRotate(degrees);
+                    Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.wheel);
+                    Bitmap b = Bitmap.createBitmap(icon, 0, 0, icon.getWidth(), icon.getHeight(), matrix, true);
+                    Drawable d = new BitmapDrawable(getResources(), b);
+                    direction.setThumb(d);
+                } else {
                     joystick_task.sendData("3000");
+
+                    Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.wheel);
+                    Drawable d = new BitmapDrawable(getResources(), icon);
+                    direction.setThumb(d);
+                }
             }
 
 
@@ -102,6 +131,7 @@ public class Joystick_Activity extends AppCompatActivity implements JoystickTask
             public void onStopTrackingTouch(SeekBar seekBar) {
 
                 joystick_task.sendData("3000");
+                direction.setProgress(255);
             }
         });
     }

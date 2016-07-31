@@ -38,6 +38,7 @@
             android:minHeight="100dp"
             android:indeterminate="false" />
 
+
         <Button
             android:id="@+id/backward"
             android:layout_width="0dp"
