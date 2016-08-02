@@ -15,6 +15,7 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.widget.Toast;
 
+import camparo_dombronsky.bluerduino.Joystick.Joystick_Activity;
 import camparo_dombronsky.bluerduino.Joystick.Joystick_Setup;
 import camparo_dombronsky.bluerduino.Utils.Listeners.JoystickTaskListener;
 
@@ -26,15 +27,15 @@ public class Joystick_Activity_Thread extends AsyncTask<Void, Void, Void> {
     private Socket socket;
     private DataOutputStream dataOutputStream;
     private DataInputStream dataInputStream;
-    private JoystickTaskListener listener;
-    private Activity joystick_activity;
+    //private JoystickTaskListener listener;
+    private Joystick_Activity joystick_activity;
     private boolean andando;
 
-    public Joystick_Activity_Thread(String addr, int port, JoystickTaskListener list) {
+    public Joystick_Activity_Thread(String addr, int port, Joystick_Activity activity) {
         ip = addr;
         this.port = port;
-        listener = list;
-        joystick_activity = (Activity) list;
+       //listener = list;
+        joystick_activity = activity;
 
     }
 
@@ -46,7 +47,8 @@ public class Joystick_Activity_Thread extends AsyncTask<Void, Void, Void> {
             socket = new Socket(ip, port);
             dataOutputStream = new DataOutputStream(socket.getOutputStream());
             dataInputStream = new DataInputStream(socket.getInputStream());
-            listener.onControllerConnected();
+            //listener.onControllerConnected();
+            joystick_activity.onControllerConnected();
             while(andando) {
                 int size = dataInputStream.readInt();
                 if(size < 0){
@@ -67,9 +69,9 @@ public class Joystick_Activity_Thread extends AsyncTask<Void, Void, Void> {
                     @Override
                     public void run() {
                         if (buffer.length > 20) {
-                            if (listener != null) {
+                            if (joystick_activity != null) {
                                 Bitmap bitmap = BitmapFactory.decodeByteArray(buffer, 0, buffer.length);
-                                listener.onCameraImageIncoming(bitmap);
+                                joystick_activity.onCameraImageIncoming(bitmap);
                             }
                         }
                     }
