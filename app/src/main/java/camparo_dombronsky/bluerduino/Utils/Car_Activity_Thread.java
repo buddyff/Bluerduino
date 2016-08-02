@@ -95,6 +95,7 @@ public class Car_Activity_Thread extends AsyncTask<Void, Void, Void> implements 
     public Void doInBackground(Void... arg0) {
         String messageFromClient;
 
+        //Try to establish connection via BT
         new Thread() {
             @Override
             public void run() {
@@ -106,22 +107,22 @@ public class Car_Activity_Thread extends AsyncTask<Void, Void, Void> implements 
         try {
             serverSocket = new ServerSocket(SocketServerPORT);
             socket = null;
+
+            //This block will be executed just the first time to establish the connection
+            if (socket == null) {
+                socket = serverSocket.accept();
+                dataInputStream = new DataInputStream(socket.getInputStream());
+                dataOutputStream = new DataOutputStream(socket.getOutputStream());
+                out = socket.getOutputStream();
+                isConnected = true;
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         while (!isCancelled()) {
             try {
-                //This block will be executed just the first time to establish the connection
-                if (socket == null) {
-
-                    socket = serverSocket.accept();
-                    dataInputStream = new DataInputStream(socket.getInputStream());
-                    dataOutputStream = new DataOutputStream(socket.getOutputStream());
-                    out = socket.getOutputStream();
-                    isConnected = true;
-                }
-
-
                 //If no message sent from client, this code will block the program
                 messageFromClient = dataInputStream.readUTF();
                 System.out.println("Me llego instruccion..");
@@ -314,6 +315,7 @@ public class Car_Activity_Thread extends AsyncTask<Void, Void, Void> implements 
     }
 
     //method to check if the device has Bluetooth and if it is on.
+    //Also checks that the device is paired
     //Prompts the user to turn it on if it is off
     //Waits for the result of the prompt to establish bt connection
     public boolean checkBTState() {
