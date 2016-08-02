@@ -128,8 +128,7 @@ public class Car_Activity extends AppCompatActivity {
         switch (requestCode) {
             case 1: {
                 if (resultCode == RESULT_OK) {
-                    car_thread.connectBluetooth();
-
+                    car_thread.checkBTState();
                 } else {
                     // Acciones adicionales a realizar si el usuario no activa el Bluetooth
                 }
@@ -198,10 +197,6 @@ public class Car_Activity extends AppCompatActivity {
             Toast.makeText(getBaseContext(), "No se pudo establecer conexión BT", Toast.LENGTH_SHORT).show();
             statusBtn.setBackground(ContextCompat.getDrawable(getBaseContext(), R.drawable.retry));
         }
-    }
-
-    public void jaja(){
-
     }
 
 }
