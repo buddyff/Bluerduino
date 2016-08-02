@@ -94,6 +94,7 @@ public class Car_Activity_Thread extends AsyncTask<Void, Void, Void> implements 
     @Override
     public Void doInBackground(Void... arg0) {
         String messageFromClient;
+
         new Thread() {
             @Override
             public void run() {
@@ -269,29 +270,18 @@ public class Car_Activity_Thread extends AsyncTask<Void, Void, Void> implements 
         }
     }
 
-    public void connectBluetooth() {
-        // Get a set of currently paired devices
-        Set<BluetoothDevice> pairedDevices = btAdapter.getBondedDevices();
-        // Look for the Arduino Bluetooth Device
-        if (pairedDevices.size() > 0) {
-            for (BluetoothDevice paired_device : pairedDevices) {
-                if (paired_device.getAddress().equals(ARDUINO_MAC)) {
-                    device = paired_device;
-                    break;
-                }
-            }
+    public void connectBluetooth(BluetoothDevice device) {
+
+        //Create an RFCOMM BluetoothSocket ready to start a secure outgoing connection to this remote device
+        try {
+            btSocket = device.createRfcommSocketToServiceRecord(ARDUINO_UUID);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
         }
 
-        if (device != null) {
-            //Create an RFCOMM BluetoothSocket ready to start a secure outgoing connection to this remote device
-            try {
-                btSocket = device.createRfcommSocketToServiceRecord(ARDUINO_UUID);
-            } catch (Exception e) {
-            }
-            System.out.println("Creo el socket bluetooth");
-        } else {
-            Toast.makeText(carActivity.getBaseContext(), "El dispositivo Bluetooth del Arduino no se encuentra emparejado", Toast.LENGTH_SHORT).show();
-        }
+        System.out.println("Creo el socket bluetooth");
+
 
         //System.out.println("Socket conectado : " + btSocket.toString());
         if (btSocket != null && !btSocket.isConnected()) {
@@ -325,6 +315,7 @@ public class Car_Activity_Thread extends AsyncTask<Void, Void, Void> implements 
 
     //method to check if the device has Bluetooth and if it is on.
     //Prompts the user to turn it on if it is off
+    //Waits for the result of the prompt to establish bt connection
     public boolean checkBTState() {
         // Check if the device has Bluetooth and that it is turned on
         btAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -335,7 +326,30 @@ public class Car_Activity_Thread extends AsyncTask<Void, Void, Void> implements 
             if (!btAdapter.isEnabled()) {
                 Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 carActivity.startActivityForResult(enableBtIntent, 1);
-            } else connectBluetooth();
+            } else{
+                // Get a set of currently paired devices
+                Set<BluetoothDevice> pairedDevices = btAdapter.getBondedDevices();
+                // Look for the Arduino Bluetooth Device
+                if (pairedDevices.size() > 0) {
+                    for (BluetoothDevice paired_device : pairedDevices) {
+                        if (paired_device.getAddress().equals(ARDUINO_MAC)) {
+                            device = paired_device;
+                            break;
+                        }
+                    }
+                }
+                if (device != null)
+                    connectBluetooth(device);
+                else
+                    carActivity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(carActivity.getBaseContext(), "El dispositivo Bluetooth del Arduino no se encuentra emparejado", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+            }
+
         }
         return true;
     }
