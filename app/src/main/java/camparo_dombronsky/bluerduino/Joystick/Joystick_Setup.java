@@ -16,7 +16,7 @@ public class Joystick_Setup extends AppCompatActivity {
 
     TextView ip;
     ImageButton buttonConnect;
-    Button btn1,btn2,btn3,btn4,btn5,btn6,btn7,btn8,btn9,btn0,btnD,btnE;
+    ImageButton btn1,btn2,btn3,btn4,btn5,btn6,btn7,btn8,btn9,btn0,btnD,btnE;
 
 
     @Override
@@ -28,18 +28,18 @@ public class Joystick_Setup extends AppCompatActivity {
         buttonConnect = (ImageButton)findViewById(R.id.connect);
         buttonConnect.setOnClickListener(buttonConnectOnClickListener);
 
-        btn1 = (Button)findViewById(R.id.btn1);
-        btn2 = (Button)findViewById(R.id.btn2);
-        btn3 = (Button)findViewById(R.id.btn3);
-        btn4 = (Button)findViewById(R.id.btn4);
-        btn5 = (Button)findViewById(R.id.btn5);
-        btn6 = (Button)findViewById(R.id.btn6);
-        btn7 = (Button)findViewById(R.id.btn7);
-        btn8 = (Button)findViewById(R.id.btn8);
-        btn9 = (Button)findViewById(R.id.btn9);
-        btn0 = (Button)findViewById(R.id.btn0);
-        btnD = (Button)findViewById(R.id.btnD);
-        btnE = (Button)findViewById(R.id.btnE);
+        btn1 = (ImageButton)findViewById(R.id.btn1);
+        btn2 = (ImageButton)findViewById(R.id.btn2);
+        btn3 = (ImageButton)findViewById(R.id.btn3);
+        btn4 = (ImageButton)findViewById(R.id.btn4);
+        btn5 = (ImageButton)findViewById(R.id.btn5);
+        btn6 = (ImageButton)findViewById(R.id.btn6);
+        btn7 = (ImageButton)findViewById(R.id.btn7);
+        btn8 = (ImageButton)findViewById(R.id.btn8);
+        btn9 = (ImageButton)findViewById(R.id.btn9);
+        btn0 = (ImageButton)findViewById(R.id.btn0);
+        btnD = (ImageButton)findViewById(R.id.btnD);
+        btnE = (ImageButton)findViewById(R.id.btnE);
 
         btn1.setOnClickListener(new OnClickListener() {
             @Override
@@ -134,6 +134,7 @@ public class Joystick_Setup extends AppCompatActivity {
 
                 @Override
                 public void onClick(View arg0) {
+                    buttonConnect.setImageResource(R.drawable.on);
                     Intent intent = new Intent(Joystick_Setup.this, Joystick_Activity.class);
                     intent.putExtra("ip",ip.getText().toString());
                     startActivity(intent);

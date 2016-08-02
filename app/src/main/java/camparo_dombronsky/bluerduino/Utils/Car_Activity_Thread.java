@@ -149,13 +149,13 @@ public class Car_Activity_Thread extends AsyncTask<Void, Void, Void> implements 
 
     public void sendImageData(byte[] data) {
         try {
-            System.out.println("flag 1 sned data");
+            System.out.println("flag n1 sned data");
             if (dataOutputStream != null) {
-                System.out.println("flag 2 sned data");
+                System.out.println("flag n2 sned data");
                 dataOutputStream.writeInt(data.length);
                 dataOutputStream.write(data);
                 out.flush();
-                System.out.println("flag 3 sned data");
+                System.out.println("flag n3 sned data");
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -226,12 +226,12 @@ public class Car_Activity_Thread extends AsyncTask<Void, Void, Void> implements 
             try {
                 decodeYUV420(rgbs, data, w, h);
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                System.out.println("Flag 1");
+                System.out.println("Flag n1");
 
                 if (isConnected()) {
                     //Todo : en vez de 50 hay que poner un selector de calidad de imagen como el de ioio
                     Bitmap.createBitmap(rgbs, w, h, Bitmap.Config.ARGB_8888).compress(Bitmap.CompressFormat.JPEG, 50, bos);
-                    System.out.println("Flag 2");
+                    System.out.println("Flag n2");
                     sendImageData(bos.toByteArray());
                 }
                 //listener.onPreviewTaken(Bitmap.createBitmap(rgbs, w, h, Bitmap.Config.ARGB_8888));

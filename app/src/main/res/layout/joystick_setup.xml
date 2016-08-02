@@ -9,7 +9,6 @@
     android:orientation="vertical"
     android:columnCount="2"
     android:rowCount="1"
-    tools:context=".MainActivity"
     android:background="@drawable/wallpaper">
 
 
@@ -34,75 +33,85 @@
             android:layout_column="0"
             android:layout_row="1" />
 
-        <Button
+        <ImageButton
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:id="@+id/btn1"
-            android:text="1"/>
-        <Button
+            android:src= "@drawable/n1"/>
+        <ImageButton
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:id="@+id/btn2"
-            android:text="2"/>
-        <Button
+            android:text="2"
+            android:src= "@drawable/n2"/>
+        <ImageButton
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:id="@+id/btn3"
-            android:text="3"/>
+            android:text="3"
+            android:src= "@drawable/n3"/>
         <Space
             android:layout_width="36dp"
             android:layout_column="0"/>
-        <Button
+        <ImageButton
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:id="@+id/btn4"
-            android:text="4"/>
-        <Button
+            android:text="4"
+            android:src= "@drawable/n4"/>
+        <ImageButton
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:id="@+id/btn5"
-            android:text="5"/>
-        <Button
+            android:text="5"
+            android:src= "@drawable/n5"/>
+        <ImageButton
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:id="@+id/btn6"
-            android:text="6"/>
+            android:text="6"
+            android:src= "@drawable/n6"/>
         <Space
             android:layout_width="36dp"
             android:layout_column="0"/>
-        <Button
+        <ImageButton
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:id="@+id/btn7"
-            android:text="7"/>
-        <Button
+            android:text="7"
+            android:src= "@drawable/n7"/>
+        <ImageButton
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:id="@+id/btn8"
-            android:text="8"/>
-        <Button
+            android:text="8"
+            android:src= "@drawable/n8"/>
+        <ImageButton
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:id="@+id/btn9"
-            android:text="9"/>
+            android:text="9"
+            android:src= "@drawable/n9"/>
         <Space
             android:layout_width="36dp"
             android:layout_column="0"/>
-        <Button
+        <ImageButton
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:id="@+id/btnD"
-            android:text="."/>
-        <Button
+            android:text="."
+            android:src= "@drawable/dot"/>
+        <ImageButton
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:id="@+id/btn0"
-            android:text="0"/>
-        <Button
+            android:text="0"
+            android:src= "@drawable/n0"/>
+        <ImageButton
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:id="@+id/btnE"
-            android:src="@drawable/erase"/>
+            android:src= "@drawable/erase"/>
     </GridLayout>
 
     <GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -140,6 +149,6 @@
             android:layout_height="wrap_content"
             android:background="@null"
             android:paddingLeft="15dp"
-            android:src="@drawable/run"/>
+            android:src="@drawable/off"/>
     </GridLayout>
 </GridLayout>
