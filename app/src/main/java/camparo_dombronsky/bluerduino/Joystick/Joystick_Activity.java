@@ -3,7 +3,6 @@ package camparo_dombronsky.bluerduino.Joystick;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
-import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -18,12 +17,11 @@ import android.widget.SeekBar;
 
 import camparo_dombronsky.bluerduino.R;
 import camparo_dombronsky.bluerduino.Utils.Joystick_Activity_Thread;
-import camparo_dombronsky.bluerduino.Utils.Listeners.JoystickTaskListener;
 
 /**
  * Created by rcamparo on 13/04/2016.
  */
-public class Joystick_Activity extends AppCompatActivity implements JoystickTaskListener {
+public class Joystick_Activity extends AppCompatActivity {
     private Joystick_Activity_Thread joystick_task;
     private boolean isConnected = false;
     private ImageView cameraImage;
@@ -151,13 +149,13 @@ public class Joystick_Activity extends AppCompatActivity implements JoystickTask
         joystick_task.execute();
     }
 
-    @Override
+
     public void onControllerConnected() {
         isConnected = true;
     }
 
 
-    @Override
+
     public void onCameraImageIncoming(Bitmap bitmap) {
         cameraImage.setImageBitmap(bitmap);
     }

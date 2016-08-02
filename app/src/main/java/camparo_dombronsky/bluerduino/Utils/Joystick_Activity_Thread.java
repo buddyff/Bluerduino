@@ -7,8 +7,6 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -17,7 +15,6 @@ import android.widget.Toast;
 
 import camparo_dombronsky.bluerduino.Joystick.Joystick_Activity;
 import camparo_dombronsky.bluerduino.Joystick.Joystick_Setup;
-import camparo_dombronsky.bluerduino.Utils.Listeners.JoystickTaskListener;
 
 
 public class Joystick_Activity_Thread extends AsyncTask<Void, Void, Void> {
