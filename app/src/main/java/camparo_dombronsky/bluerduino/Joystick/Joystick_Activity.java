@@ -140,13 +140,14 @@ public class Joystick_Activity extends AppCompatActivity {
         //Para avisar que se desconecto
         joystick_task.sendData("9999");
         System.out.println("Se ejecuta el onStop");
-        joystick_task.frenar();
+        joystick_task.interrupt();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        joystick_task.execute();
+        if(!joystick_task.isAlive())
+            joystick_task.start();
     }
 
 

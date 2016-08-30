@@ -17,7 +17,7 @@ import camparo_dombronsky.bluerduino.Joystick.Joystick_Activity;
 import camparo_dombronsky.bluerduino.Joystick.Joystick_Setup;
 
 
-public class Joystick_Activity_Thread extends AsyncTask<Void, Void, Void> {
+public class Joystick_Activity_Thread extends Thread {
 
     private String ip;
     private int port;
@@ -37,16 +37,15 @@ public class Joystick_Activity_Thread extends AsyncTask<Void, Void, Void> {
     }
 
     @Override
-    protected Void doInBackground(Void... arg0) {
+    public void run(){
         try {
-            andando = true;
             System.out.println("EMPEZO EL HILO MAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAN");
             socket = new Socket(ip, port);
             dataOutputStream = new DataOutputStream(socket.getOutputStream());
             dataInputStream = new DataInputStream(socket.getInputStream());
             //listener.onControllerConnected();
             joystick_activity.onControllerConnected();
-            while(andando) {
+            while(!isInterrupted()) {
                 int size = dataInputStream.readInt();
                 if(size < 0){
                     socket.close();
@@ -82,7 +81,6 @@ public class Joystick_Activity_Thread extends AsyncTask<Void, Void, Void> {
         catch (IOException e) {
             e.printStackTrace();
         }
-        return null;
     }
 
    /* @Override
@@ -91,15 +89,11 @@ public class Joystick_Activity_Thread extends AsyncTask<Void, Void, Void> {
         super.onPostExecute(result);
     }*/
 
-    public void frenar(){
-        andando = false;
-    }
-
     public void sendData (String data){
         try {
             dataOutputStream.writeUTF(data);
             //dataOutputStream.writeInt(data);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

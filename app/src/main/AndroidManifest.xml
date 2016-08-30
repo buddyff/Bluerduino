@@ -39,13 +39,15 @@
         <activity
             android:name=".Joystick.Joystick_Setup"
             android:label="@string/app_name"
-            android:screenOrientation="landscape">
+            android:screenOrientation="landscape"
+            android:configChanges="orientation">
         </activity>
 
         <activity
             android:name=".Joystick.Joystick_Activity"
             android:label="@string/app_name"
-            android:screenOrientation="landscape">
+            android:screenOrientation="landscape"
+            android:configChanges="orientation">
         </activity>
 
     </application>

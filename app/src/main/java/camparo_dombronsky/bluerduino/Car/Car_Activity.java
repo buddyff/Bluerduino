@@ -93,7 +93,7 @@ public class Car_Activity extends AppCompatActivity {
             frameLayout.getHolder().setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
             frameLayout.getHolder().addCallback(car_thread);
 
-            car_thread.execute();
+            car_thread.start();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -115,12 +115,13 @@ public class Car_Activity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        car_thread.killJoystick();
+        car_thread.closeSockets();
         super.onDestroy();
         System.out.println("Destruyo el thread");
 
-        car_thread.killJoystick();
-        car_thread.closeSockets();
-        car_thread.cancel(true);
+        //car_thread.cancel(true);
+        car_thread.interrupt();
     }
 
     @Override

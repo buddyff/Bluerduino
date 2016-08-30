@@ -1,23 +1,19 @@
 package camparo_dombronsky.bluerduino.Utils;
 
-import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
-import android.graphics.Bitmap;
+import android.graphics.Rect;
+import android.graphics.YuvImage;
 import android.hardware.Camera;
-import android.os.AsyncTask;
-import android.support.v4.content.ContextCompat;
 import android.view.SurfaceHolder;
-import android.widget.ImageButton;
 import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -25,10 +21,8 @@ import java.util.Set;
 import java.util.UUID;
 
 import camparo_dombronsky.bluerduino.Car.Car_Activity;
-import camparo_dombronsky.bluerduino.Joystick.Joystick_Setup;
-import camparo_dombronsky.bluerduino.R;
 
-public class Car_Activity_Thread extends AsyncTask<Void, Void, Void> implements SurfaceHolder.Callback, Camera.PreviewCallback {
+public class Car_Activity_Thread extends Thread implements SurfaceHolder.Callback, Camera.PreviewCallback {
 
     private static final int SocketServerPORT = 7000;
     private ServerSocket serverSocket;
@@ -50,11 +44,12 @@ public class Car_Activity_Thread extends AsyncTask<Void, Void, Void> implements 
     private static final String ARDUINO_MAC = "98:D3:35:00:98:52";
     private static final UUID ARDUINO_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
-
     private Camera mCamera;
     private int w, h;
     private int[] rgbs;
     private boolean initialed = false;
+    private ByteArrayOutputStream bos;
+    private YuvImage yuv;
 
     private Car_Activity carActivity;
 
@@ -92,7 +87,7 @@ public class Car_Activity_Thread extends AsyncTask<Void, Void, Void> implements 
     }
 
     @Override
-    public Void doInBackground(Void... arg0) {
+    public void run() {
         String messageFromClient;
 
         //Try to establish connection via BT
@@ -103,31 +98,30 @@ public class Car_Activity_Thread extends AsyncTask<Void, Void, Void> implements 
             }
         }.start();
 
-
         try {
             serverSocket = new ServerSocket(SocketServerPORT);
             socket = null;
-
-            //This block will be executed just the first time to establish the connection
-            if (socket == null) {
-                socket = serverSocket.accept();
-                dataInputStream = new DataInputStream(socket.getInputStream());
-                dataOutputStream = new DataOutputStream(socket.getOutputStream());
-                out = socket.getOutputStream();
-                isConnected = true;
-            }
 
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        while (!isCancelled()) {
+        while (!isInterrupted()) {
             try {
+                //This block will be executed just the first time to establish the connection
+                if (socket == null) {
+                    socket = serverSocket.accept();
+                    dataInputStream = new DataInputStream(socket.getInputStream());
+                    dataOutputStream = new DataOutputStream(socket.getOutputStream());
+                    out = socket.getOutputStream();
+                    isConnected = true;
+                }
+
                 //If no message sent from client, this code will block the program
                 messageFromClient = dataInputStream.readUTF();
                 System.out.println("Me llego instruccion..");
                 if (messageFromClient.equals("9999")) {
-                    System.out.println("ME LLEGO LKA DE CE RRAR EL SOCKET");
+                    System.out.println("ME LLEGO LA DE CERRAR EL SOCKET");
                     socket = null;
                     isConnected = false;
                 } else {
@@ -141,9 +135,8 @@ public class Car_Activity_Thread extends AsyncTask<Void, Void, Void> implements 
             } catch (Exception e) {
             }
         }
-
-        System.out.println("Termina DoInBackground");
-        return null;
+        //System.out.println("Termina DoInBackground");
+        //return null;
     }
 
 
@@ -224,13 +217,17 @@ public class Car_Activity_Thread extends AsyncTask<Void, Void, Void> implements 
 
         if (data != null) {
             try {
-                decodeYUV420(rgbs, data, w, h);
-                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                //decodeYUV420(rgbs, data, w, h);
+                bos = new ByteArrayOutputStream();
                 System.out.println("Flag n1");
 
                 if (isConnected()) {
                     //Todo : en vez de 50 hay que poner un selector de calidad de imagen como el de ioio
-                    Bitmap.createBitmap(rgbs, w, h, Bitmap.Config.ARGB_8888).compress(Bitmap.CompressFormat.JPEG, 50, bos);
+                    //Bitmap.createBitmap(rgbs, w, h, Bitmap.Config.ARGB_8888).compress(Bitmap.CompressFormat.JPEG, 50, bos);
+                    yuv = new YuvImage(data, camera.getParameters().getPreviewFormat(), w, h, null);
+
+// bWidth and bHeight define the size of the bitmap you wish the fill with the preview image
+                    yuv.compressToJpeg(new Rect(0, 0, w, h), 50, bos);
                     System.out.println("Flag n2");
                     sendImageData(bos.toByteArray());
                 }
