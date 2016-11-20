@@ -6,7 +6,6 @@ import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
-import android.hardware.Camera;
 import android.view.SurfaceHolder;
 import android.widget.Toast;
 
@@ -20,9 +19,9 @@ import java.net.Socket;
 import java.util.Set;
 import java.util.UUID;
 
-import camparo_dombronsky.bluerduino.Car.Car_Activity;
+import camparo_dombronsky.bluerduino.Camera.Camera;
 
-public class Car_Activity_Thread extends Thread implements SurfaceHolder.Callback, Camera.PreviewCallback {
+public class Camera_Thread extends Thread implements SurfaceHolder.Callback, android.hardware.Camera.PreviewCallback {
 
     private static final int SocketServerPORT = 7000;
     private ServerSocket serverSocket;
@@ -44,22 +43,22 @@ public class Car_Activity_Thread extends Thread implements SurfaceHolder.Callbac
     private static final String ARDUINO_MAC = "98:D3:35:00:98:52";
     private static final UUID ARDUINO_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
-    private Camera mCamera;
+    private android.hardware.Camera mCamera;
     private int w, h;
     private int[] rgbs;
     private boolean initialed = false;
     private ByteArrayOutputStream bos;
     private YuvImage yuv;
 
-    private Car_Activity carActivity;
+    private Camera carActivity;
 
-    private boolean isConnected;
+    private boolean isConnected,flashing;
 
-   // private static Car_Activity_Thread instance = null;
+   // private static Camera_Thread instance = null;
 
-    /*public static Car_Activity_Thread getInstance(Car_Activity _carActivity) {
+    /*public static Camera_Thread getInstance(Camera _carActivity) {
         if (instance == null) {
-            instance = new Car_Activity_Thread(_carActivity);
+            instance = new Camera_Thread(_carActivity);
         }
         return instance;
     }
@@ -68,8 +67,9 @@ public class Car_Activity_Thread extends Thread implements SurfaceHolder.Callbac
         return instance != null;
     }*/
 
-    public Car_Activity_Thread(Car_Activity _carActivity) {
+    public Camera_Thread(Camera _carActivity) {
         carActivity = _carActivity;
+        isConnected = false;
     }
 
     public void closeSockets() {
@@ -85,6 +85,7 @@ public class Car_Activity_Thread extends Thread implements SurfaceHolder.Callbac
             e.printStackTrace();
         }
     }
+
 
     @Override
     public void run() {
@@ -110,6 +111,7 @@ public class Car_Activity_Thread extends Thread implements SurfaceHolder.Callbac
             try {
                 //This block will be executed just the first time to establish the connection
                 if (socket == null) {
+                    System.out.println("Espero por una conexion");
                     socket = serverSocket.accept();
                     dataInputStream = new DataInputStream(socket.getInputStream());
                     dataOutputStream = new DataOutputStream(socket.getOutputStream());
@@ -124,15 +126,23 @@ public class Car_Activity_Thread extends Thread implements SurfaceHolder.Callbac
                     System.out.println("ME LLEGO LA DE CERRAR EL SOCKET");
                     socket = null;
                     isConnected = false;
-                } else {
+                }
+                else if(messageFromClient.equals("8888")){      //FLASH!
+                    if(flashing)
+                        mCamera.getParameters().setFlashMode(android.hardware.Camera.Parameters.FLASH_MODE_OFF);
+                    else
+                        mCamera.getParameters().setFlashMode(android.hardware.Camera.Parameters.FLASH_MODE_TORCH);
+                }
+                else {
                     byte[] msgBuffer = messageFromClient.getBytes();
                     if (btOutStream != null) {
-                        System.out.println("La mando al Arduino");
+                        System.out.println("La mando al Arduino " + messageFromClient);
                         btOutStream.write(msgBuffer);
                         btOutStream.flush();
                     }
                 }
             } catch (Exception e) {
+                e.printStackTrace();
             }
         }
         //System.out.println("Termina DoInBackground");
@@ -142,18 +152,20 @@ public class Car_Activity_Thread extends Thread implements SurfaceHolder.Callbac
 
     public void sendImageData(byte[] data) {
         try {
-            System.out.println("flag n1 sned data");
             if (dataOutputStream != null) {
-                System.out.println("flag n2 sned data");
                 dataOutputStream.writeInt(data.length);
                 dataOutputStream.write(data);
                 out.flush();
-                System.out.println("flag n3 sned data");
+                System.out.println("Mande la imagen");
             }
         } catch (IOException e) {
             e.printStackTrace();
+            this.interrupt();
         } catch (NullPointerException e) {
             e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+            this.interrupt();
         }
     }
 
@@ -165,14 +177,23 @@ public class Car_Activity_Thread extends Thread implements SurfaceHolder.Callbac
         }
     }
 
-    public boolean isConnected() {
-        return isConnected;
-    }
 
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        createCameraInstance(holder);
+        try {
+            if (mCamera == null) {
+                mCamera = android.hardware.Camera.open(0);
+                mCamera.setPreviewCallback(this);
+                mCamera.setPreviewDisplay(holder);
+                mCamera.startPreview();
+
+                w = mCamera.getParameters().getPreviewSize().width;
+                h = mCamera.getParameters().getPreviewSize().height;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -186,18 +207,6 @@ public class Car_Activity_Thread extends Thread implements SurfaceHolder.Callbac
         }
     }
 
-    private void createCameraInstance(SurfaceHolder holder) {
-        try {
-            if (mCamera == null) {
-                mCamera = Camera.open(0);
-                mCamera.setPreviewCallback(this);
-                mCamera.setPreviewDisplay(holder);
-                mCamera.startPreview();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
@@ -206,64 +215,17 @@ public class Car_Activity_Thread extends Thread implements SurfaceHolder.Callbac
 
 
     @Override
-    public void onPreviewFrame(byte[] data, Camera camera) {
-        System.out.println("estoy mostrando cosaas");
-        if (!initialed) {
-            w = mCamera.getParameters().getPreviewSize().width;
-            h = mCamera.getParameters().getPreviewSize().height;
-            rgbs = new int[w * h];
-            initialed = true;
-        }
-
+    public void onPreviewFrame(byte[] data, android.hardware.Camera camera) {
         if (data != null) {
             try {
-                //decodeYUV420(rgbs, data, w, h);
                 bos = new ByteArrayOutputStream();
-                System.out.println("Flag n1");
-
-                if (isConnected()) {
-                    //Todo : en vez de 50 hay que poner un selector de calidad de imagen como el de ioio
-                    //Bitmap.createBitmap(rgbs, w, h, Bitmap.Config.ARGB_8888).compress(Bitmap.CompressFormat.JPEG, 50, bos);
+                if (isConnected) {
                     yuv = new YuvImage(data, camera.getParameters().getPreviewFormat(), w, h, null);
-
-// bWidth and bHeight define the size of the bitmap you wish the fill with the preview image
-                    yuv.compressToJpeg(new Rect(0, 0, w, h), 50, bos);
-                    System.out.println("Flag n2");
+                    yuv.compressToJpeg(new Rect(0, 0, w, h), 40, bos);
                     sendImageData(bos.toByteArray());
                 }
-                //listener.onPreviewTaken(Bitmap.createBitmap(rgbs, w, h, Bitmap.Config.ARGB_8888));
             } catch (OutOfMemoryError e) {
                 e.printStackTrace();
-            }
-        }
-    }
-
-    private void decodeYUV420(int[] rgb, byte[] yuv420, int width, int height) {
-        final int frameSize = width * height;
-
-        for (int j = 0, yp = 0; j < height; j++) {
-            int uvp = frameSize + (j >> 1) * width, u = 0, v = 0;
-            for (int i = 0; i < width; i++, yp++) {
-                int y = (0xff & ((int) yuv420[yp])) - 16;
-                if (y < 0) y = 0;
-                if ((i & 1) == 0) {
-                    v = (0xff & yuv420[uvp++]) - 128;
-                    u = (0xff & yuv420[uvp++]) - 128;
-                }
-
-                int y1192 = 1192 * y;
-                int r = (y1192 + 1634 * v);
-                int g = (y1192 - 833 * v - 400 * u);
-                int b = (y1192 + 2066 * u);
-
-                if (r < 0) r = 0;
-                else if (r > 262143) r = 262143;
-                if (g < 0) g = 0;
-                else if (g > 262143) g = 262143;
-                if (b < 0) b = 0;
-                else if (b > 262143) b = 262143;
-
-                rgb[yp] = 0xff000000 | ((r << 6) & 0xff0000) | ((g >> 2) & 0xff00) | ((b >> 10) & 0xff);
             }
         }
     }

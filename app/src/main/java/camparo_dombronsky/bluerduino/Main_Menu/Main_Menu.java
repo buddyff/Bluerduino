@@ -3,15 +3,17 @@ package camparo_dombronsky.bluerduino.Main_Menu;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import camparo_dombronsky.bluerduino.Car.Car_Activity;
+import camparo_dombronsky.bluerduino.Camera.Camera;
 import camparo_dombronsky.bluerduino.Joystick.Joystick_Setup;
 import camparo_dombronsky.bluerduino.R;
 
@@ -19,7 +21,6 @@ public class Main_Menu extends Activity {
     private ImageButton btn_car;
     private ImageButton btn_joystick;
     private TextView title;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +38,7 @@ public class Main_Menu extends Activity {
                     Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                     startActivityForResult(enableBtIntent, 1);
                 } else {
-                    Intent intent = new Intent(Main_Menu.this, Car_Activity.class);
+                    Intent intent = new Intent(Main_Menu.this, Camera.class);
                     startActivity(intent);
                 }
             }
@@ -58,7 +59,7 @@ public class Main_Menu extends Activity {
             case 1: {
                 if (resultCode == RESULT_OK) {
 
-                    Intent intent = new Intent(Main_Menu.this, Car_Activity.class);
+                    Intent intent = new Intent(Main_Menu.this, Camera.class);
                     startActivity(intent);
                 } else {
                     // Acciones adicionales a realizar si el usuario no activa el Bluetooth

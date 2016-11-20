@@ -1,32 +1,40 @@
 package camparo_dombronsky.bluerduino.Joystick;
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
+import android.widget.Toast;
 
+import camparo_dombronsky.bluerduino.Main_Menu.Main_Menu;
 import camparo_dombronsky.bluerduino.R;
-import camparo_dombronsky.bluerduino.Utils.Joystick_Activity_Thread;
+import camparo_dombronsky.bluerduino.Utils.Joystick_Thread;
 
 /**
  * Created by rcamparo on 13/04/2016.
  */
-public class Joystick_Activity extends AppCompatActivity {
-    private Joystick_Activity_Thread joystick_task;
-    private boolean isConnected = false;
+public class Joystick extends AppCompatActivity {
+    private Joystick_Thread joystick_task;
+    //private boolean isConnected = false;
     private ImageView cameraImage;
-    private Button forward, backward;
+    private ImageButton forward, backward, flash;
     private SeekBar direction;
+    private boolean flashing;
+    private Vibrator vibrator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,15 +43,35 @@ public class Joystick_Activity extends AppCompatActivity {
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        forward = (Button) findViewById(R.id.forward);
-        backward = (Button) findViewById(R.id.backward);
+        flashing = false;
+
+        vibrator =(Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+
+        forward = (ImageButton) findViewById(R.id.forward);
+        backward = (ImageButton) findViewById(R.id.backward);
         direction = (SeekBar) findViewById(R.id.direction);
+        flash = (ImageButton) findViewById(R.id.flash);
 
         cameraImage = (ImageView) findViewById(R.id.iv_camera_image);
 
         Bundle bundle = getIntent().getExtras();
 
-        joystick_task = new Joystick_Activity_Thread((String) bundle.getString("ip"), 7000, this);
+        joystick_task = new Joystick_Thread((String) bundle.getString("ip"), 7000, this);
+
+        flash.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                vibrator.vibrate(50);
+
+                joystick_task.flash();
+                flashing = !flashing;
+
+                if(flashing)
+                    flash.setBackground(getResources().getDrawable(R.drawable.flash_on));
+                else
+                    flash.setBackground(getResources().getDrawable(R.drawable.flash_off));
+            }
+        });
 
         //Forward Listener
         forward.setOnTouchListener(new View.OnTouchListener() {
@@ -53,6 +81,7 @@ public class Joystick_Activity extends AppCompatActivity {
                 switch (action) {
                     case MotionEvent.ACTION_DOWN:
                         joystick_task.sendData("1000");
+                        vibrator.vibrate(50);
                         break;
                     case MotionEvent.ACTION_UP:
                         joystick_task.sendData("5000");
@@ -70,6 +99,7 @@ public class Joystick_Activity extends AppCompatActivity {
                 switch (action) {
                     case MotionEvent.ACTION_DOWN:
                         joystick_task.sendData("2000");
+                        vibrator.vibrate(50);
                         break;
                     case MotionEvent.ACTION_UP:
                         joystick_task.sendData("5000");
@@ -147,13 +177,18 @@ public class Joystick_Activity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
         if(!joystick_task.isAlive())
-            joystick_task.start();
+            try {
+                joystick_task.start();
+            }catch (Exception e){
+                Intent intent = new Intent(this, Main_Menu.class);
+                this.startActivity(intent);
+            }
     }
 
 
-    public void onControllerConnected() {
+   /* public void onControllerConnected() {
         isConnected = true;
-    }
+    }*/
 
 
 

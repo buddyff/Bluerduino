@@ -10,14 +10,15 @@
         android:id="@+id/iv_camera_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:contentDescription="@null" />
+        android:contentDescription="@null"
+        android:background="#000000" />
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:orientation="horizontal"
         android:gravity="right"
-        android:paddingBottom="30dp"
+        android:paddingBottom="15dp"
         android:paddingRight="20dp"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
@@ -31,30 +32,40 @@
             android:layout_gravity="bottom"
             android:id="@+id/direction"
             android:max="510"
-            android:layout_weight="2.5"
+            android:layout_weight="2"
             android:progress="255"
             android:thumb="@drawable/wheel"
             android:maxHeight="100dp"
             android:minHeight="100dp"
-            android:indeterminate="false" />
+            android:indeterminate="false"
+            android:layout_marginRight="50dp"/>
 
 
-        <Button
+        <ImageButton
             android:id="@+id/backward"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:text="Reversa"
-            android:layout_marginLeft="50dp"
-            android:layout_weight="1" />
+            android:layout_weight="0.5"
+            android:background="@drawable/down"/>
 
-        <Button
+        <ImageButton
+            android:id="@+id/flash"
+            android:layout_gravity="top"
+            android:layout_marginLeft="10dp"
+            android:background="@drawable/flash_off"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"/>
+
+        <ImageButton
             android:id="@+id/forward"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:text="Acelerar"
-            android:layout_weight="1" />
+            android:layout_weight="0.5"
+            android:layout_marginLeft="10dp"
+            android:background="@drawable/up"/>
+
     </LinearLayout>
 
 

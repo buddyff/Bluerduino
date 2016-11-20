@@ -10,14 +10,13 @@ import java.net.UnknownHostException;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.widget.Toast;
 
-import camparo_dombronsky.bluerduino.Joystick.Joystick_Activity;
+import camparo_dombronsky.bluerduino.Joystick.Joystick;
 import camparo_dombronsky.bluerduino.Joystick.Joystick_Setup;
 
 
-public class Joystick_Activity_Thread extends Thread {
+public class Joystick_Thread extends Thread {
 
     private String ip;
     private int port;
@@ -25,16 +24,21 @@ public class Joystick_Activity_Thread extends Thread {
     private DataOutputStream dataOutputStream;
     private DataInputStream dataInputStream;
     //private JoystickTaskListener listener;
-    private Joystick_Activity joystick_activity;
+    private Joystick joystick_;
     private boolean andando;
 
-    public Joystick_Activity_Thread(String addr, int port, Joystick_Activity activity) {
+    public Joystick_Thread(String addr, int port, Joystick activity) {
         ip = addr;
         this.port = port;
        //listener = list;
-        joystick_activity = activity;
+        joystick_ = activity;
 
     }
+
+    public void flash(){
+        sendData("8888");
+    }
+
 
     @Override
     public void run(){
@@ -44,34 +48,36 @@ public class Joystick_Activity_Thread extends Thread {
             dataOutputStream = new DataOutputStream(socket.getOutputStream());
             dataInputStream = new DataInputStream(socket.getInputStream());
             //listener.onControllerConnected();
-            joystick_activity.onControllerConnected();
+            //joystick_.onControllerConnected();
             while(!isInterrupted()) {
                 int size = dataInputStream.readInt();
-                if(size < 0){
+                if (size < 0) {
                     socket.close();
-                    joystick_activity.runOnUiThread(new Runnable() {
+                    joystick_.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Intent intent = new Intent(joystick_activity, Joystick_Setup.class);
-                            joystick_activity.startActivity(intent);
-                            Toast.makeText(joystick_activity.getApplicationContext(), "Se perdio la conexion con Camera", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(joystick_, Joystick_Setup.class);
+                            joystick_.startActivity(intent);
+                            Toast.makeText(joystick_.getApplicationContext(), "Se perdio la conexion con Camera", Toast.LENGTH_SHORT).show();
                         }
                     });
-                    break;
-                }
-                final byte[] buffer = new byte[size];
-                dataInputStream.readFully(buffer);
-                joystick_activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (buffer.length > 20) {
-                            if (joystick_activity != null) {
-                                Bitmap bitmap = BitmapFactory.decodeByteArray(buffer, 0, buffer.length);
-                                joystick_activity.onCameraImageIncoming(bitmap);
+                    this.interrupt();
+                } else {
+                    final byte[] buffer = new byte[size];
+                    dataInputStream.readFully(buffer);
+
+                    joystick_.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (buffer.length > 20) {
+                                if (joystick_ != null) {
+                                    Bitmap bitmap = BitmapFactory.decodeByteArray(buffer, 0, buffer.length);
+                                    joystick_.onCameraImageIncoming(bitmap);
+                                }
                             }
                         }
-                    }
-                });
+                    });
+                }
             }
             System.out.println("Muere Joystick Activity Thread");
         }

@@ -1,20 +1,13 @@
-package camparo_dombronsky.bluerduino.Car;
+package camparo_dombronsky.bluerduino.Camera;
 
 import camparo_dombronsky.bluerduino.R;
-import camparo_dombronsky.bluerduino.Utils.Car_Activity_Thread;
+import camparo_dombronsky.bluerduino.Utils.Camera_Thread;
 
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
-import java.util.Set;
-import java.util.UUID;
 
-
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -30,10 +23,10 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class Car_Activity extends AppCompatActivity {
+public class Camera extends AppCompatActivity {
 
     private TextView infoip;
-    private Car_Activity_Thread car_thread;
+    private Camera_Thread car_thread;
     private SurfaceView frameLayout;
 
     private boolean isTurnedOn = true;
@@ -60,7 +53,6 @@ public class Car_Activity extends AppCompatActivity {
         });
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        System.out.println("ON CREATEEEEEEEEEEEEEEEEEEEEEEEE");
 
 
         prendeApaga = (ImageButton) findViewById(R.id.btn_prende_apaga);
@@ -85,8 +77,7 @@ public class Car_Activity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         try {
-            System.out.println("Creo el thread GUACHOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
-            car_thread = new Car_Activity_Thread(this);
+            car_thread = new Camera_Thread(this);
 
             frameLayout = (SurfaceView) findViewById(R.id.camera_preview);
             // Create our Preview view and set it as the content of our activity.
@@ -94,23 +85,9 @@ public class Car_Activity extends AppCompatActivity {
             frameLayout.getHolder().addCallback(car_thread);
 
             car_thread.start();
-
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        System.out.println("PAUSEEEEEEE");
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        System.out.println("STOPEOOOOO");
-
     }
 
     @Override
