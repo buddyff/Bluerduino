@@ -45,6 +45,7 @@ public class Joystick_Thread extends Thread {
         try {
             System.out.println("EMPEZO EL HILO MAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAN");
             socket = new Socket(ip, port);
+            socket.setTcpNoDelay(true);
             dataOutputStream = new DataOutputStream(socket.getOutputStream());
             dataInputStream = new DataInputStream(socket.getInputStream());
             //listener.onControllerConnected();
