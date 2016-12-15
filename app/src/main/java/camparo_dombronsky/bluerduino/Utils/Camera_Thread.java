@@ -114,6 +114,7 @@ public class Camera_Thread extends Thread implements SurfaceHolder.Callback, and
                     System.out.println("Espero por una conexion");
                     socket = serverSocket.accept();
                     socket.setTcpNoDelay(true);
+                    socket.setPerformancePreferences(0,1,2);
                     dataInputStream = new DataInputStream(socket.getInputStream());
                     dataOutputStream = new DataOutputStream(socket.getOutputStream());
                     out = socket.getOutputStream();
